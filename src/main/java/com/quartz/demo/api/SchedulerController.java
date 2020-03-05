@@ -14,22 +14,22 @@ import com.quartz.demo.api.payload.JobDetailsResponse;
 import com.quartz.demo.api.payload.ScheduleJobRequest;
 import com.quartz.demo.api.payload.ScheduleJobResponse;
 import com.quartz.demo.dto.QuartzTaskInformation;
-import com.quartz.demo.service.QuartzServiceInformation;
+import com.quartz.demo.service.QuartzService;
 
 @RestController
 public class SchedulerController {
 	private ModelMapper modelMapper;
-	private QuartzServiceInformation quartzServiceInformation;
+	private QuartzService quartzService;
 
 	@Autowired
-	SchedulerController(ModelMapper modelMapper, QuartzServiceInformation quartzServiceInformation) {
+	SchedulerController(ModelMapper modelMapper, QuartzService quartzServiceInformation) {
 		this.modelMapper = modelMapper;
-		this.quartzServiceInformation = quartzServiceInformation;
+		this.quartzService = quartzServiceInformation;
 	}
 
 	@PostMapping("/add-job")
 	public ResponseEntity<ScheduleJobResponse> addJob(@RequestBody ScheduleJobRequest scheduleJobRequest) {
-		QuartzTaskInformation quartzTaskInformation = this.quartzServiceInformation
+		QuartzTaskInformation quartzTaskInformation = this.quartzService
 				.insertNewJob(this.modelMapper.map(scheduleJobRequest, QuartzTaskInformation.class));
 		ScheduleJobResponse scheduleJobResponse = this.modelMapper.map(quartzTaskInformation,
 				ScheduleJobResponse.class);
@@ -40,7 +40,7 @@ public class SchedulerController {
 	
 	@GetMapping("/get-job/{id}")
 	public ResponseEntity<JobDetailsResponse> getJob(@PathVariable String id) {
-		return new ResponseEntity<>(this.modelMapper.map(this.quartzServiceInformation.getJobDetails(id)
+		return new ResponseEntity<>(this.modelMapper.map(this.quartzService.getJobDetails(id)
 				,JobDetailsResponse.class),HttpStatus.OK);
 	}
 

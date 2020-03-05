@@ -1,4 +1,4 @@
-package com.quartz.demo.service.impl;
+package com.quartz.demo.service.info.impl;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -9,25 +9,22 @@ import org.springframework.stereotype.Service;
 import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.io.entity.QuartzTaskInformationEntity;
 import com.quartz.demo.io.repo.QuartzTaskInformationRepo;
-import com.quartz.demo.service.QuartzServiceInformation;
+import com.quartz.demo.service.QuartzService;
 import com.quartz.demo.util.enums.JobStatus;
 
 @Service
-public class QuartzServiceInformationImpl implements QuartzServiceInformation {
+public class QuartzInformationImplService implements QuartzService {
 
 	private QuartzTaskInformationRepo quartzTaskInformationRepo;
 	private ModelMapper modelMapper;
 
-	public QuartzServiceInformationImpl(QuartzTaskInformationRepo quartzTaskInformationRepo, ModelMapper modelMapper) {
+	public QuartzInformationImplService(QuartzTaskInformationRepo quartzTaskInformationRepo, ModelMapper modelMapper) {
 		this.quartzTaskInformationRepo = quartzTaskInformationRepo;
 		this.modelMapper = modelMapper;
 	}
 
 	@Override
-	public QuartzTaskInformation insertNewJob(QuartzTaskInformation schedulejobRequest) {
-		QuartzTaskInformation quartzTaskInformation = this.modelMapper.map(schedulejobRequest,
-				QuartzTaskInformation.class);
-
+	public QuartzTaskInformation insertNewJob(QuartzTaskInformation quartzTaskInformation) {
 		// quartzTaskInformation.setTaskId(UUID.randomUUID().toString());
 		QuartzTaskInformationEntity entity = this.modelMapper.map(quartzTaskInformation,
 				QuartzTaskInformationEntity.class);

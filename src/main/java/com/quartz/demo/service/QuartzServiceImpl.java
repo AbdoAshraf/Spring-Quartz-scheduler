@@ -1,59 +1,39 @@
-//package com.quartz.demo.service;
-//
-//import java.util.UUID;
-//
-//import org.quartz.CronScheduleBuilder;
-//import org.quartz.JobBuilder;
-//import org.quartz.JobDataMap;
-//import org.quartz.JobDetail;
-//import org.quartz.Scheduler;
-//import org.quartz.SchedulerException;
-//import org.quartz.Trigger;
-//import org.quartz.TriggerBuilder;
-//import org.springframework.beans.factory.annotation.Autowired;
-//
-//import com.quartz.demo.dto.QuartzTaskInformations;
-//import com.quartz.demo.job.DummyJob;
-//import com.quartz.demo.payload.ScheduleJobRequest;
-//import com.quartz.demo.payload.ScheduleJobResponse;
-//
-//public class QuartzServiceImpl implements QuartzService {
-//
-//	@Autowired
-//	private Scheduler scheduler;
-//
-////	@Override
-////	public QuartzTaskInformations addJob(QuartzTaskInformations quartzTaskInformations) throws SchedulerException {
-//////		JobDetail jobDetail = buildJobDetail(schedulejobRequest);
-//////		Trigger trigger = buildJobTrigger(jobDetail);
-//////		scheduler.scheduleJob(jobDetail, trigger);
-//////		ScheduleJobResponse scheduleEmailResponse = new ScheduleJobResponse(true, jobDetail.getKey().getName(),
-//////				jobDetail.getKey().getGroup(), "Email Scheduled Successfully!");
-//////		return scheduleEmailResponse;
-////		return null;
-////	}
-//
-////	private JobDetail buildJobDetail(ScheduleJobRequest schedulejobRequest) {
-////		JobDataMap jobDataMap = new JobDataMap();
-////
-////		jobDataMap.put("Description", schedulejobRequest.getJobDescription());
-////		jobDataMap.put("name", schedulejobRequest.getJobName());
-////		// jobDataMap.put("body", scheduleEmailRequest.getBody());
-////
-////		return JobBuilder.newJob(DummyJob.class).withIdentity(UUID.randomUUID().toString(), "dummy-jobs")
-////				.withDescription("Send Email Job").usingJobData(jobDataMap).storeDurably().build();
-////	}
-////
-////	private Trigger buildJobTrigger(JobDetail jobDetail) {
-////		return TriggerBuilder.newTrigger().forJob(jobDetail).withIdentity(jobDetail.getKey().getName(), "jobtriggers")
-////				.withDescription("Send Email Trigger").withSchedule(CronScheduleBuilder.cronSchedule("0/5 * * ? * * *"))
-////				.build();
-////	}
-//
-//	@Override
-//	public QuartzTaskInformations addJob(QuartzTaskInformations schedulejobRequest) throws SchedulerException {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//}
+package com.quartz.demo.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.quartz.demo.dto.QuartzTaskInformation;
+import com.quartz.demo.service.info.QuartzInformationService;
+import com.quartz.demo.service.scheduler.QuartzSchedulerService;
+
+@Service
+public class QuartzServiceImpl implements QuartzService {
+	private QuartzInformationService quartzInformationService;
+	private QuartzSchedulerService quartzSchedulerService;
+
+	@Autowired
+	public QuartzServiceImpl(QuartzInformationService quartzInformationService,
+			QuartzSchedulerService quartzSchedulerService) {
+		this.quartzInformationService = quartzInformationService;
+		this.quartzSchedulerService = quartzSchedulerService;
+	}
+
+	@Override
+	public QuartzTaskInformation insertNewJob(QuartzTaskInformation quartzTaskInformation) {
+		return this.quartzInformationService.insertNewJob(quartzTaskInformation);
+	}
+
+	@Override
+	public QuartzTaskInformation updateJob(QuartzTaskInformation schedulejobRequest) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public QuartzTaskInformation getJobDetails(String id) {
+		this.quartzInformationService.getJobDetails(id);
+		return null;
+	}
+
+}
