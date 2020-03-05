@@ -1,6 +1,9 @@
 package com.quartz.demo.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
+import com.quartz.demo.util.enums.JobStatus;
 
 import lombok.Data;
 import lombok.Getter;
@@ -9,22 +12,22 @@ import lombok.Setter;
 @Getter
 @Setter
 @Data
-public class QuartzTaskInformations {
-	private Long taskId;
+public class QuartzTaskInformation {
+	private String taskId;
 	
 	private String taskName;
 
 	private String cornExp;
 
-	private String frozenStatus;
+	private JobStatus jobStatus;
 
-	private Long frozenTime;
+	private LocalDateTime frozenTime;
 
-	private Long unfrozenTime;
+	private LocalDateTime unfrozenTime;
 
-	private Long createTime;
+	private LocalDateTime createTime;
 
-	private Long lastmodifyTime;
+	private LocalDateTime lastmodifyTime;
 
 	private String sendType;
 

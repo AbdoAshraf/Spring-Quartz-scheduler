@@ -1,13 +1,13 @@
 package com.quartz.demo.service;
 
-import com.quartz.demo.dto.QuartzTaskInformations;
+import com.quartz.demo.dto.QuartzTaskInformation;
 
 public interface QuartzServiceInformation {
 
-	QuartzTaskInformations insertNewJob(QuartzTaskInformations schedulejobRequest);
+	QuartzTaskInformation insertNewJob(QuartzTaskInformation schedulejobRequest);
 
-	QuartzTaskInformations updateJob(QuartzTaskInformations schedulejobRequest);
+	QuartzTaskInformation updateJob(QuartzTaskInformation schedulejobRequest);
 
-	QuartzTaskInformations getJobDetails(String id);
+	QuartzTaskInformation getJobDetails(String id);
 
 }

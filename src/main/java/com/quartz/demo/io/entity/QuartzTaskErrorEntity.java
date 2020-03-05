@@ -1,6 +1,8 @@
 package com.quartz.demo.io.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 import lombok.Data;
 import lombok.Getter;
@@ -10,11 +12,15 @@ import lombok.Setter;
 @Setter
 @Data
 
-@Entity(name = "QuartzTaskError")
-public class QuartzTaskError {
+@Entity
+public class QuartzTaskErrorEntity {
+	@Id
+	@GeneratedValue
+	private long id;
+	
 	private String errorId;
 
-	private Long executeTime;
+	private String executeTime;
 
 	private String failReason;
 

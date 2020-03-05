@@ -1,13 +1,14 @@
-package com.quartz.demo.controller.payload;
+package com.quartz.demo.api.payload;
 
-import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Data
-public class JobDetails {
+@NoArgsConstructor
+public abstract class JobDetails {
+	
 	private String taskname;
 
 	private String cornExp; //

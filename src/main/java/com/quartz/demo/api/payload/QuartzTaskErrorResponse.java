@@ -1,4 +1,6 @@
-package com.quartz.demo.controller.payload;
+package com.quartz.demo.api.payload;
+
+import java.time.LocalDateTime;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,10 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class QuartzTaskErrorResponse {
-	private Long executeTime;
+	private LocalDateTime executeTime;
 
 	private String failReason;
-
-	private Long lastModifytime;
 
 }
