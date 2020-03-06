@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,12 +37,19 @@ public class SchedulerController {
 		return new ResponseEntity<>(scheduleJobResponse, HttpStatus.OK);
 
 	}
-	
-	
+
 	@GetMapping("/get-job/{id}")
 	public ResponseEntity<JobDetailsResponse> getJob(@PathVariable String id) {
-		return new ResponseEntity<>(this.modelMapper.map(this.quartzService.getJobDetails(id)
-				,JobDetailsResponse.class),HttpStatus.OK);
+		return new ResponseEntity<>(
+				this.modelMapper.map(this.quartzService.getJobDetails(id), JobDetailsResponse.class), HttpStatus.OK);
+	}
+
+	@PutMapping("/scedule-job/{jobId}")
+	public ResponseEntity<ScheduleJobResponse> addJob(@PathVariable String jobId) {
+		this.quartzService.ScheduleJob(jobId);
+
+		return new ResponseEntity<>(new ScheduleJobResponse(jobId, "job scheduled sucessfully"), HttpStatus.OK);
+
 	}
 
 }

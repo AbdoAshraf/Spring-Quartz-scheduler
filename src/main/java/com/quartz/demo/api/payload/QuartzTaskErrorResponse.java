@@ -9,7 +9,5 @@ import lombok.Setter;
 @Setter
 public class QuartzTaskErrorResponse {
 	private LocalDateTime executeTime;
-
 	private String failReason;
-
 }

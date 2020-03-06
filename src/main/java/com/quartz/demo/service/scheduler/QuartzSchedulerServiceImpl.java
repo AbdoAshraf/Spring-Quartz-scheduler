@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.job.DummyJob;
-import com.quartz.demo.service.QuartzService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,13 +23,9 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 
 	private Scheduler scheduler;
 
-	private QuartzService quartzService;
-
 	@Autowired
-	public QuartzSchedulerServiceImpl(Scheduler scheduler, QuartzService quartzService) {
+	public QuartzSchedulerServiceImpl(Scheduler scheduler) {
 		this.scheduler = scheduler;
-
-		this.quartzService = quartzService;
 	}
 
 	@Override
@@ -119,9 +114,9 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 //			quartzTaskInformation.setJobStatus(JobStatus.FROZEN);
 		} catch (Exception e) {
 			// throw new ServiceException(e.getMessage());
-			//this.recordError(e, quartzTaskInformation.getTaskId());
+			// this.recordError(e, quartzTaskInformation.getTaskId());
 		}
-		this.quartzService.updateJob(quartzTaskInformation);
+		//this.quartzService.updateJob(quartzTaskInformation);
 		return true;
 	}
 
@@ -131,7 +126,7 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 			this.resume(quartzTaskInformation.getTaskId(), this.scheduler.DEFAULT_GROUP);
 		} catch (Exception e) {
 		}
-		this.quartzService.updateJob(quartzTaskInformation);
+		//this.quartzService.updateJob(quartzTaskInformation);
 		return true;
 	}
 
