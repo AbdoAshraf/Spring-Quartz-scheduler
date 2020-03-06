@@ -13,13 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 public class DummyJob extends QuartzJobBean {
-    private static final Logger logger = LoggerFactory.getLogger(DummyJob.class);
-
-    
-
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        logger.info("Executing Job with key {}", jobExecutionContext.getJobDetail().getKey());
+        log.info("Executing Job with key {}", jobExecutionContext.getJobDetail().getKey());
 
     }
 }

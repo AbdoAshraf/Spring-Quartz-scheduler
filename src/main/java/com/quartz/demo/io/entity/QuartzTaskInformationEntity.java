@@ -30,9 +30,8 @@ public class QuartzTaskInformationEntity {
 	@Column(nullable = false)
 	private String taskId;
 
-	@Column( nullable = false)
+	@Column(nullable = false)
 	private String taskName;
-
 
 	private String cornExp;
 
@@ -40,11 +39,11 @@ public class QuartzTaskInformationEntity {
 	private LocalDateTime frozenTime;
 
 	private LocalDateTime unfrozenTime;
-	
+
 	private LocalDateTime createTime;
 
 	private LocalDateTime lastmodifyTime;
-	
+
 	private String sendType;
 
 	private String url;

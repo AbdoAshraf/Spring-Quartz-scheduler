@@ -9,5 +9,13 @@ public interface QuartzService {
 	QuartzTaskInformation updateJob(QuartzTaskInformation quartzTaskInformation);
 
 	QuartzTaskInformation getJobDetails(String id);
+	
+	boolean freezJob(String jobId);
+	
+	boolean ScheduleJob(String jobId);
+	
+	boolean ResumeJob(String jobId);
+
+	
 
 }

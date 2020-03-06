@@ -9,5 +9,6 @@ public interface QuartzInformationService {
 	QuartzTaskInformation updateJob(QuartzTaskInformation quartzTaskInformation);
 
 	QuartzTaskInformation getJobDetails(String id);
-
+	
+	void recordError(Exception e, String id);
 }
