@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import com.quartz.demo.util.enums.JobStatus;
+import com.quartz.demo.util.enums.SendType;
 
 import lombok.Data;
 import lombok.Getter;
@@ -44,7 +45,7 @@ public class QuartzTaskInformationEntity {
 
 	private LocalDateTime lastmodifyTime;
 
-	private String sendType;
+	private SendType sendType;
 
 	private String url;
 

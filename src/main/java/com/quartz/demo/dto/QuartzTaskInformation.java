@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.quartz.demo.util.enums.JobStatus;
+import com.quartz.demo.util.enums.SendType;
 
 import lombok.Data;
 import lombok.Getter;
@@ -29,7 +30,7 @@ public class QuartzTaskInformation {
 
 	private LocalDateTime lastmodifyTime;
 
-	private String sendType;
+	private SendType sendType;
 
 	private String url;
 

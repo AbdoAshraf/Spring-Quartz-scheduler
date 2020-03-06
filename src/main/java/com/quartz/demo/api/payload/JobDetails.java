@@ -1,5 +1,7 @@
 package com.quartz.demo.api.payload;
 
+import com.quartz.demo.util.enums.SendType;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +15,7 @@ public abstract class JobDetails {
 
 	private String cornExp; //
 
-	private String sendtype;
+	private SendType sendtype;
 
 	private String url;
 

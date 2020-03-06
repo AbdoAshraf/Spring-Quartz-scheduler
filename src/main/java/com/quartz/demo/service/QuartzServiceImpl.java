@@ -11,6 +11,7 @@ import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.exception.CustomSchedulerServiceException;
 import com.quartz.demo.service.info.QuartzInformationService;
 import com.quartz.demo.service.scheduler.QuartzSchedulerService;
+import com.quartz.demo.util.enums.JobStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,6 +51,10 @@ public class QuartzServiceImpl implements QuartzService {
 		} catch (SchedulerException e) {
 			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
 		}
+		quartzTaskInformation.setFrozenTime(LocalDateTime.now());
+		quartzTaskInformation.setLastmodifyTime(LocalDateTime.now());
+		quartzTaskInformation.setJobStatus(JobStatus.FROZEN);
+		this.quartzInformationService.updateJob(quartzTaskInformation);
 		return true;
 	}
 
@@ -63,6 +68,8 @@ public class QuartzServiceImpl implements QuartzService {
 		}
 		quartzTaskInformation.setLastmodifyTime(LocalDateTime.now());
 		quartzTaskInformation.setUnfrozenTime(LocalDateTime.now());
+		quartzTaskInformation.setJobStatus(JobStatus.FROZEN);
+		this.quartzInformationService.updateJob(quartzTaskInformation);
 		return true;
 
 	}
@@ -76,14 +83,16 @@ public class QuartzServiceImpl implements QuartzService {
 			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
 
 		}
+		quartzTaskInformation.setLastmodifyTime(LocalDateTime.now());
+		quartzTaskInformation.setUnfrozenTime(LocalDateTime.now());
+		quartzTaskInformation.setJobStatus(JobStatus.UNFROZEN);
+		this.quartzInformationService.updateJob(quartzTaskInformation);
 		return true;
 	}
 
-	public void recordError(Exception e, String id) {
-		QuartzTaskError quartzTaskError = new QuartzTaskError();
-		quartzTaskError.setExecuteTime(LocalDateTime.now());
-		quartzTaskError.setFailReason(e.getMessage());
-
+	@Override
+	public void recordError(QuartzTaskError quartzTaskError, String id) {
+		this.quartzInformationService.getJobDetails(id).getQuartzTaskErrorsList().add(quartzTaskError);
 	}
 
 }

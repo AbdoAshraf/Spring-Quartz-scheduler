@@ -38,7 +38,8 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 				.withIdentity(quartzTaskInformation.getTaskId(), Scheduler.DEFAULT_GROUP).build();
 		JobDataMap jobDataMap = jobDetail.getJobDataMap();
 		jobDataMap.put("id", quartzTaskInformation.getTaskId());
-		jobDataMap.put("sendType", quartzTaskInformation.getSendType());
+		jobDataMap.put("name", quartzTaskInformation.getTaskName());
+		jobDataMap.put("sendType", quartzTaskInformation.getSendType().toString());
 		jobDataMap.put("url", quartzTaskInformation.getUrl());
 		jobDataMap.put("executeParameter", quartzTaskInformation.getExecuteParamter());
 		CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(quartzTaskInformation.getCornExp());
