@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.quartz.demo.dto.QuartzTaskError;
 import com.quartz.demo.dto.QuartzTaskInformation;
+import com.quartz.demo.exception.InfoServiceExcseption;
 import com.quartz.demo.io.entity.QuartzTaskErrorEntity;
 import com.quartz.demo.io.entity.QuartzTaskInformationEntity;
 import com.quartz.demo.io.repo.QuartzTaskInformationRepo;
@@ -26,7 +27,7 @@ public class QuartzInformationServiceImpl implements QuartzInformationService {
 
 	@Override
 	public QuartzTaskInformation insertNewJob(QuartzTaskInformation quartzTaskInformation) {
-		// quartzTaskInformation.setTaskId(UUID.randomUUID().toString());
+		//validation step
 		QuartzTaskInformationEntity entity = this.modelMapper.map(quartzTaskInformation,
 				QuartzTaskInformationEntity.class);
 		entity.setTaskId(UUID.randomUUID().toString());
@@ -38,6 +39,9 @@ public class QuartzInformationServiceImpl implements QuartzInformationService {
 
 	@Override
 	public QuartzTaskInformation updateJob(QuartzTaskInformation quartzTaskInformation) {
+		if (this.quartzTaskInformationRepo.findByTaskId(quartzTaskInformation.getTaskId()) ==null)
+			throw new InfoServiceExcseption("invalid task id");
+			
 		QuartzTaskInformationEntity entity = this.modelMapper.map(quartzTaskInformation,
 				QuartzTaskInformationEntity.class);
 		entity = this.quartzTaskInformationRepo.save(entity);
@@ -46,11 +50,15 @@ public class QuartzInformationServiceImpl implements QuartzInformationService {
 
 	@Override
 	public QuartzTaskInformation getJobDetails(String id) {
+		if (this.quartzTaskInformationRepo.findByTaskId(id) ==null)
+			throw new InfoServiceExcseption("invalid task id");
 		return this.modelMapper.map(this.quartzTaskInformationRepo.findByTaskId(id), QuartzTaskInformation.class);
 	}
 
 	@Override
 	public void recordError(Exception e, String taskId) {
+		if (this.quartzTaskInformationRepo.findByTaskId(taskId) ==null)
+				throw new InfoServiceExcseption("invalid task id recordError");
 		QuartzTaskInformationEntity entity=this.quartzTaskInformationRepo.findByTaskId(taskId);
 		entity.setFailCount(entity.getFailCount()+1);
 		QuartzTaskError quartzTaskError= new QuartzTaskError();

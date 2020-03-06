@@ -1,6 +1,7 @@
 package com.quartz.demo.service;
 
 import com.quartz.demo.dto.QuartzTaskInformation;
+import com.quartz.demo.exception.CustomSchedulerServiceException;
 
 public interface QuartzService {
 	
@@ -10,11 +11,11 @@ public interface QuartzService {
 
 	QuartzTaskInformation getJobDetails(String id);
 	
-	boolean freezJob(String jobId);
+	boolean freezJob(String jobId) throws CustomSchedulerServiceException;
 	
-	boolean ScheduleJob(String jobId);
+	boolean ScheduleJob(String jobId)throws CustomSchedulerServiceException;
 	
-	boolean ResumeJob(String jobId);
+	boolean ResumeJob(String jobId)throws CustomSchedulerServiceException;
 
 	
 

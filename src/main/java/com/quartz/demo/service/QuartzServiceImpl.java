@@ -2,15 +2,20 @@ package com.quartz.demo.service;
 
 import java.time.LocalDateTime;
 
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.quartz.demo.dto.QuartzTaskError;
 import com.quartz.demo.dto.QuartzTaskInformation;
+import com.quartz.demo.exception.CustomSchedulerServiceException;
 import com.quartz.demo.service.info.QuartzInformationService;
 import com.quartz.demo.service.scheduler.QuartzSchedulerService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class QuartzServiceImpl implements QuartzService {
 	private QuartzInformationService quartzInformationService;
 	private QuartzSchedulerService quartzSchedulerService;
@@ -34,41 +39,41 @@ public class QuartzServiceImpl implements QuartzService {
 
 	@Override
 	public QuartzTaskInformation getJobDetails(String id) {
-		this.quartzInformationService.getJobDetails(id);
-		return null;
+		return this.quartzInformationService.getJobDetails(id);
 	}
 
 	@Override
-	public boolean freezJob(String jobId) {
+	public boolean freezJob(String jobId) throws CustomSchedulerServiceException {
 		QuartzTaskInformation quartzTaskInformation = this.quartzInformationService.getJobDetails(jobId);
 		try {
 			this.quartzSchedulerService.pausejob(quartzTaskInformation);
-		} catch (Exception e) {
-
+		} catch (SchedulerException e) {
+			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
 		}
 		return true;
 	}
 
 	@Override
-	public boolean ScheduleJob(String jobId) {
+	public boolean ScheduleJob(String jobId) throws CustomSchedulerServiceException {
 		QuartzTaskInformation quartzTaskInformation = this.quartzInformationService.getJobDetails(jobId);
 		try {
 			this.quartzSchedulerService.scheduleJob(quartzTaskInformation);
-			quartzTaskInformation.setLastmodifyTime(LocalDateTime.now());
-			quartzTaskInformation.setUnfrozenTime(LocalDateTime.now());
-		} catch (Exception e) {
-
+		} catch (SchedulerException e) {
+			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
 		}
+		quartzTaskInformation.setLastmodifyTime(LocalDateTime.now());
+		quartzTaskInformation.setUnfrozenTime(LocalDateTime.now());
 		return true;
 
 	}
 
 	@Override
-	public boolean ResumeJob(String jobId) {
+	public boolean ResumeJob(String jobId) throws CustomSchedulerServiceException {
 		QuartzTaskInformation quartzTaskInformation = this.quartzInformationService.getJobDetails(jobId);
 		try {
 			this.quartzSchedulerService.resumeJob(quartzTaskInformation);
-		} catch (Exception e) {
+		} catch (SchedulerException e) {
+			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
 
 		}
 		return true;
