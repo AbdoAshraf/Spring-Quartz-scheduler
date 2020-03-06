@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.exception.CustomSchedulerServiceException;
-import com.quartz.demo.job.DummyJob;
+import com.quartz.demo.job.QuartzMainJobFactory;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,10 +30,10 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 	}
 
 	@Override
-
-	public boolean scheduleJob(QuartzTaskInformation quartzTaskInformation) throws CustomSchedulerServiceException, SchedulerException {
+	public boolean scheduleJob(QuartzTaskInformation quartzTaskInformation)
+			throws CustomSchedulerServiceException, SchedulerException {
 		TriggerKey triggerKey = TriggerKey.triggerKey(quartzTaskInformation.getTaskId(), Scheduler.DEFAULT_GROUP);
-		JobDetail jobDetail = JobBuilder.newJob(DummyJob.class)
+		JobDetail jobDetail = JobBuilder.newJob(QuartzMainJobFactory.class)
 				.withDescription(quartzTaskInformation.getExecuteParamter())
 				.withIdentity(quartzTaskInformation.getTaskId(), Scheduler.DEFAULT_GROUP).build();
 		JobDataMap jobDataMap = jobDetail.getJobDataMap();
@@ -51,21 +51,21 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 	}
 
 	@Override
-	public boolean UnscheduleJob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException{
+	public boolean UnscheduleJob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException {
 		this.delete(quartzTaskInformation.getTaskId(), Scheduler.DEFAULT_GROUP);
 		return true;
 	}
 
-	private boolean delete(String jobName, String jobGroup) throws SchedulerException{
+	private boolean delete(String jobName, String jobGroup) throws SchedulerException {
 		boolean flag = false;
-			if (checkExists(jobName, jobGroup)) {
-				TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
-				scheduler.pauseTrigger(triggerKey);
-				scheduler.unscheduleJob(triggerKey);
-				flag = true;
-				String schedulerName = scheduler.getSchedulerName();
-				log.info("schedulerName:{},jobName:{},jobGroup:{} 删除成功", schedulerName, jobName, jobGroup);
-			}
+		if (checkExists(jobName, jobGroup)) {
+			TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
+			scheduler.pauseTrigger(triggerKey);
+			scheduler.unscheduleJob(triggerKey);
+			flag = true;
+			String schedulerName = scheduler.getSchedulerName();
+			log.info("schedulerName:{},jobName:{},jobGroup:{} 删除成功", schedulerName, jobName, jobGroup);
+		}
 		return flag;
 	}
 
@@ -83,12 +83,12 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 
 	@Override
 	public boolean resumeJob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException {
-			this.resume(quartzTaskInformation.getTaskId(), this.scheduler.DEFAULT_GROUP);
+		this.resume(quartzTaskInformation.getTaskId(), this.scheduler.DEFAULT_GROUP);
 		return true;
 	}
 
-	public boolean pausejob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException  {
-			this.pause(quartzTaskInformation.getTaskId(), this.scheduler.DEFAULT_GROUP);
+	public boolean pausejob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException {
+		this.pause(quartzTaskInformation.getTaskId(), this.scheduler.DEFAULT_GROUP);
 		return true;
 	}
 
