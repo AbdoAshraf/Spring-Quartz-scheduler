@@ -1,6 +1,7 @@
 package com.quartz.demo.io.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,7 +25,7 @@ public class QuartzTaskErrorEntity implements Serializable{
 	
 	private String errorId;
 
-	private String executeTime;
+	private LocalDateTime executeTime;
 
 	private String failReason;
 

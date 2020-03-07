@@ -38,5 +38,8 @@ public abstract class JobDetails {
 	private CronMisfire cronMisfire;
 
 	private int intervalInSeconds = 0;
+	
+    private int repeatCount = 0;
+
 
 }

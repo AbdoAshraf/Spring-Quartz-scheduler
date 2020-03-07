@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.quartz.demo.dto.QuartzTaskError;
 import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.exception.InfoServiceExcseption;
+import com.quartz.demo.io.entity.QuartzTaskErrorEntity;
 import com.quartz.demo.io.entity.QuartzTaskInformationEntity;
 import com.quartz.demo.io.repo.QuartzTaskInformationRepo;
 import com.quartz.demo.util.enums.JobStatus;
@@ -63,6 +64,7 @@ public class QuartzInformationServiceImpl implements QuartzInformationService {
 		if (this.quartzTaskInformationRepo.findByTaskId(taskId) == null)
 			throw new InfoServiceExcseption("invalid task id recordError");
 		QuartzTaskInformationEntity entity = this.quartzTaskInformationRepo.findByTaskId(taskId);
+		entity.getQuartzTaskErrorsList().add(this.modelMapper.map(quartzTaskError, QuartzTaskErrorEntity.class));
 		entity.setFailCount(entity.getFailCount() + 1);
 		this.quartzTaskInformationRepo.save(entity);
 	}
