@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import com.quartz.demo.dto.QuartzTaskError;
 import com.quartz.demo.util.enums.CronMisfire;
 import com.quartz.demo.util.enums.JobStatus;
 import com.quartz.demo.util.enums.SendType;

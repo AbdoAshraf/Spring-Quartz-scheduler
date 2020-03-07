@@ -1,5 +1,7 @@
 package com.quartz.demo.api;
 
+import javax.validation.Valid;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +31,7 @@ public class SchedulerController {
 	}
 
 	@PostMapping("/add-job")
-	public ResponseEntity<ScheduleJobResponse> addJob(@RequestBody ScheduleJobRequest scheduleJobRequest) {
+	public ResponseEntity<ScheduleJobResponse> addJob(@RequestBody @Valid ScheduleJobRequest scheduleJobRequest) {
 		QuartzTaskInformation quartzTaskInformation = this.quartzService
 				.insertNewJob(this.modelMapper.map(scheduleJobRequest, QuartzTaskInformation.class));
 		ScheduleJobResponse scheduleJobResponse = this.modelMapper.map(quartzTaskInformation,
@@ -47,7 +49,6 @@ public class SchedulerController {
 	@PutMapping("/scedule-job/{jobId}")
 	public ResponseEntity<ScheduleJobResponse> addJob(@PathVariable String jobId) {
 		this.quartzService.ScheduleJob(jobId);
-
 		return new ResponseEntity<>(new ScheduleJobResponse(jobId, "job scheduled sucessfully"), HttpStatus.OK);
 
 	}
@@ -55,9 +56,7 @@ public class SchedulerController {
 	@PutMapping("/freez-job/{jobId}")
 	public ResponseEntity<ScheduleJobResponse> freezJob(@PathVariable String jobId) {
 		this.quartzService.freezJob(jobId);
-
 		return new ResponseEntity<>(new ScheduleJobResponse(jobId, "job freezed sucessfully"), HttpStatus.OK);
-
 	}
 
 	@PutMapping("/resume-job/{jobId}")
