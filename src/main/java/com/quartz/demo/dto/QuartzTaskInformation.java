@@ -35,11 +35,17 @@ public class QuartzTaskInformation {
 	private SendType sendType;
 	
 	private String triggerType;
+	
 	private int triggerPriority;
+	
 	private SimpleMisfire simpleMisfire;
+	
 	private CronMisfire cronMisfire;
+	
 	private int intervalInSeconds = 0;
+	
 	private int repeatCount=0;
+	
 	private String url;
 
 	private String executeParamter;

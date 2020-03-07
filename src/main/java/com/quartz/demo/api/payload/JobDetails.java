@@ -24,9 +24,13 @@ public abstract class JobDetails {
 	private String executeparamter;
 
 	private String triggerType;
+
 	private int triggerPriority;
+
 	private SimpleMisfire simpleMisfire;
+
 	private CronMisfire cronMisfire;
+
 	private int intervalInSeconds = 0;
 
 }

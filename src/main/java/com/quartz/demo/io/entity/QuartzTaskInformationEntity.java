@@ -61,9 +61,13 @@ public class QuartzTaskInformationEntity implements Serializable {
 	private long failCount;
 
 	private String triggerType;
+
 	private int triggerPriority;
+
 	private SimpleMisfire simpleMisfire;
+
 	private CronMisfire cronMisfire;
+
 	private int intervalInSeconds = 0;
 
 	@OneToMany(cascade = CascadeType.ALL)

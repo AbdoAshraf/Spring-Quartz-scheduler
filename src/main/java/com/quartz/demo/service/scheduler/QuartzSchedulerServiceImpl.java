@@ -35,13 +35,12 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 	}
 
 	@Override
-	public boolean scheduleJob(QuartzTaskInformation quartzTaskInformation)
-			throws CustomSchedulerServiceException, SchedulerException {
+	public boolean scheduleJob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException {
 		this.addJob(quartzTaskInformation);
 		return true;
 	}
 
-	private void addJob(QuartzTaskInformation quartzTaskInformation) {
+	private void addJob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException {
 		String jobName = quartzTaskInformation.getTaskName();// info.getJobName();
 		String jobGroup = Scheduler.DEFAULT_GROUP;
 		JobDetail jobDetail = JobBuilder.newJob(QuartzMainJobFactory.class)
@@ -55,19 +54,15 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 		jobDataMap.put("executeParameter", quartzTaskInformation.getExecuteParamter());
 		try {
 			if (checkExists(jobName, jobGroup)) {
-				throw new CustomSchedulerServiceException(
-						String.format("Job已经存在, jobName:{%s},jobGroup:{%s}", jobName, jobGroup));
+				throw new CustomSchedulerServiceException(String.format("Job already active", jobName, jobGroup));
 			}
-
 			TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
-			// JobKey jobKey = JobKey.jobKey(jobName, jobGroup);
-			// trigger
 			Trigger trigger = this.selectTrigger(triggerKey, quartzTaskInformation);
 			scheduler.scheduleJob(jobDetail, trigger);
 			String schedulerName = scheduler.getSchedulerName();
 			log.info("schedulerName:{},jobName:{},jobGroup:{},jobClass:{}", schedulerName, jobName, jobGroup);
 		} catch (SchedulerException e) {
-			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
+			throw e;
 		}
 	}
 
@@ -110,12 +105,6 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 			cronScheduleBuilder.withMisfireHandlingInstructionDoNothing();
 	}
 
-	/**
-	 * 简单失败处理指令选择策略
-	 *
-	 * @param info
-	 * @param simpleScheduleBuilder
-	 */
 	private void setSimpleMisFireType(QuartzTaskInformation info, SimpleScheduleBuilder simpleScheduleBuilder) {
 		if (SimpleMisfire.FIRE_NOW == info.getSimpleMisfire())
 			simpleScheduleBuilder.withMisfireHandlingInstructionFireNow();
@@ -147,8 +136,6 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 			scheduler.pauseTrigger(triggerKey);
 			scheduler.unscheduleJob(triggerKey);
 			flag = true;
-			String schedulerName = scheduler.getSchedulerName();
-			log.info("schedulerName:{},jobName:{},jobGroup:{} 删除成功", schedulerName, jobName, jobGroup);
 		}
 		return flag;
 	}
@@ -158,9 +145,8 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 		if (checkExists(jobName, jobGroup)) {
 			TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
 			scheduler.resumeTrigger(triggerKey);
-			String schedulerName = scheduler.getSchedulerName();
+			// String schedulerName = scheduler.getSchedulerName();
 			flag = true;
-			log.info("schedulerName:{},jobName:{},jobGroup:{},重启成功", schedulerName, jobName, jobGroup);
 		}
 		return flag;
 	}
