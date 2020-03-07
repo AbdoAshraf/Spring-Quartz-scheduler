@@ -3,8 +3,10 @@ package com.quartz.demo.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.quartz.demo.util.enums.CronMisfire;
 import com.quartz.demo.util.enums.JobStatus;
 import com.quartz.demo.util.enums.SendType;
+import com.quartz.demo.util.enums.SimpleMisfire;
 
 import lombok.Data;
 import lombok.Getter;
@@ -31,7 +33,13 @@ public class QuartzTaskInformation {
 	private LocalDateTime lastmodifyTime;
 
 	private SendType sendType;
-
+	
+	private String triggerType;
+	private int triggerPriority;
+	private SimpleMisfire simpleMisfire;
+	private CronMisfire cronMisfire;
+	private int intervalInSeconds = 0;
+	private int repeatCount=0;
 	private String url;
 
 	private String executeParamter;

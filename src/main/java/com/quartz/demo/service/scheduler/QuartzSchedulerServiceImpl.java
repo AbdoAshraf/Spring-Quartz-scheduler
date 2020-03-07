@@ -7,6 +7,9 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.SimpleScheduleBuilder;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,8 @@ import org.springframework.stereotype.Service;
 import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.exception.CustomSchedulerServiceException;
 import com.quartz.demo.job.QuartzMainJobFactory;
+import com.quartz.demo.util.enums.CronMisfire;
+import com.quartz.demo.util.enums.SimpleMisfire;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +37,13 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 	@Override
 	public boolean scheduleJob(QuartzTaskInformation quartzTaskInformation)
 			throws CustomSchedulerServiceException, SchedulerException {
-		TriggerKey triggerKey = TriggerKey.triggerKey(quartzTaskInformation.getTaskId(), Scheduler.DEFAULT_GROUP);
+		this.addJob(quartzTaskInformation);
+		return true;
+	}
+
+	private void addJob(QuartzTaskInformation quartzTaskInformation) {
+		String jobName = quartzTaskInformation.getTaskName();// info.getJobName();
+		String jobGroup = Scheduler.DEFAULT_GROUP;
 		JobDetail jobDetail = JobBuilder.newJob(QuartzMainJobFactory.class)
 				.withDescription(quartzTaskInformation.getExecuteParamter())
 				.withIdentity(quartzTaskInformation.getTaskId(), Scheduler.DEFAULT_GROUP).build();
@@ -42,12 +53,85 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 		jobDataMap.put("sendType", quartzTaskInformation.getSendType().toString());
 		jobDataMap.put("url", quartzTaskInformation.getUrl());
 		jobDataMap.put("executeParameter", quartzTaskInformation.getExecuteParamter());
-		CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(quartzTaskInformation.getCornExp());
-		CronTrigger cronTrigger = TriggerBuilder.newTrigger().withDescription(quartzTaskInformation.getTaskName())
-				.withIdentity(triggerKey).withSchedule(cronScheduleBuilder).build();
-		scheduler.scheduleJob(jobDetail, cronTrigger);
-		log.info("taskName={},scheduleRule={} load to quartz success!", quartzTaskInformation.getTaskName());
-		return true;
+		try {
+			if (checkExists(jobName, jobGroup)) {
+				throw new CustomSchedulerServiceException(
+						String.format("Job已经存在, jobName:{%s},jobGroup:{%s}", jobName, jobGroup));
+			}
+
+			TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
+			// JobKey jobKey = JobKey.jobKey(jobName, jobGroup);
+			// trigger
+			Trigger trigger = this.selectTrigger(triggerKey, quartzTaskInformation);
+			scheduler.scheduleJob(jobDetail, trigger);
+			String schedulerName = scheduler.getSchedulerName();
+			log.info("schedulerName:{},jobName:{},jobGroup:{},jobClass:{}", schedulerName, jobName, jobGroup);
+		} catch (SchedulerException e) {
+			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
+		}
+	}
+
+	private Trigger selectTrigger(TriggerKey triggerKey, QuartzTaskInformation info) {
+		Trigger trigger;
+		if (info.getTriggerType().equals("corn")) {
+			trigger = setCronTrigger(triggerKey, info);
+		} else if (info.getTriggerType().equals("simple")) {
+			trigger = setSimpleTrigger(triggerKey, info);
+		} else {
+			trigger = setCronTrigger(triggerKey, info);
+		}
+		return trigger;
+	}
+
+	private CronTrigger setCronTrigger(TriggerKey triggerKey, QuartzTaskInformation info) {
+		int triggerPriority = info.getTriggerPriority();
+		triggerPriority = triggerPriority == 0 ? 5 : triggerPriority;
+		CronScheduleBuilder schedBuilder = CronScheduleBuilder.cronSchedule(info.getCornExp());
+		this.setCronMisFireType(info, schedBuilder);
+		return TriggerBuilder.newTrigger().withIdentity(triggerKey).withPriority(triggerPriority)
+				.withSchedule(schedBuilder).build();
+	}
+
+	private SimpleTrigger setSimpleTrigger(TriggerKey triggerKey, QuartzTaskInformation info) {
+		SimpleScheduleBuilder simpleScheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
+				.withIntervalInSeconds(info.getIntervalInSeconds()).withRepeatCount(info.getRepeatCount());
+		this.setSimpleMisFireType(info, simpleScheduleBuilder);
+		return TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(simpleScheduleBuilder).build();
+	}
+
+	private void setCronMisFireType(QuartzTaskInformation info, CronScheduleBuilder cronScheduleBuilder) {
+		if (CronMisfire.DO_NOTHING == info.getCronMisfire())
+			cronScheduleBuilder.withMisfireHandlingInstructionDoNothing();
+		else if (CronMisfire.FIRE_ONCE_NOW == info.getCronMisfire())
+			cronScheduleBuilder.withMisfireHandlingInstructionFireAndProceed();
+		else if (CronMisfire.IGNORE_MISFIRES == info.getCronMisfire())
+			cronScheduleBuilder.withMisfireHandlingInstructionIgnoreMisfires();
+		else
+			cronScheduleBuilder.withMisfireHandlingInstructionDoNothing();
+	}
+
+	/**
+	 * 简单失败处理指令选择策略
+	 *
+	 * @param info
+	 * @param simpleScheduleBuilder
+	 */
+	private void setSimpleMisFireType(QuartzTaskInformation info, SimpleScheduleBuilder simpleScheduleBuilder) {
+		if (SimpleMisfire.FIRE_NOW == info.getSimpleMisfire())
+			simpleScheduleBuilder.withMisfireHandlingInstructionFireNow();
+		else if (SimpleMisfire.IGNORE_MISFIRES == info.getSimpleMisfire())
+			simpleScheduleBuilder.withMisfireHandlingInstructionIgnoreMisfires();
+		else if (SimpleMisfire.NEXT_WITH_EXISTING_COUNT == info.getSimpleMisfire())
+			simpleScheduleBuilder.withMisfireHandlingInstructionNextWithExistingCount();
+		else if (SimpleMisfire.NOW_WITH_EXISTING_COUNT == info.getSimpleMisfire())
+			simpleScheduleBuilder.withMisfireHandlingInstructionNowWithExistingCount();
+		else if (SimpleMisfire.NEXT_WITH_REMAINING_COUNT == info.getSimpleMisfire())
+			simpleScheduleBuilder.withMisfireHandlingInstructionNextWithRemainingCount();
+		else if (SimpleMisfire.NOW_WITH_REMAINING_COUNT == info.getSimpleMisfire())
+			simpleScheduleBuilder.withMisfireHandlingInstructionNowWithRemainingCount();
+		else
+			simpleScheduleBuilder.withMisfireHandlingInstructionFireNow();
+
 	}
 
 	@Override

@@ -12,8 +12,10 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import com.quartz.demo.dto.QuartzTaskError;
+import com.quartz.demo.util.enums.CronMisfire;
 import com.quartz.demo.util.enums.JobStatus;
 import com.quartz.demo.util.enums.SendType;
+import com.quartz.demo.util.enums.SimpleMisfire;
 
 import lombok.Data;
 import lombok.Getter;
@@ -24,7 +26,7 @@ import lombok.Setter;
 @Data
 @Entity
 
-public class QuartzTaskInformationEntity implements Serializable{
+public class QuartzTaskInformationEntity implements Serializable {
 	private static final long serialVersionUID = 5313493413859894403L;
 
 	@Id
@@ -57,6 +59,12 @@ public class QuartzTaskInformationEntity implements Serializable{
 	private long sucssesCount;
 
 	private long failCount;
+
+	private String triggerType;
+	private int triggerPriority;
+	private SimpleMisfire simpleMisfire;
+	private CronMisfire cronMisfire;
+	private int intervalInSeconds = 0;
 
 	@OneToMany(cascade = CascadeType.ALL)
 	List<QuartzTaskErrorEntity> quartzTaskErrorsList;
