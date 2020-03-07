@@ -10,13 +10,14 @@ import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import com.quartz.demo.config.ApplicationContextHolder;
+import com.quartz.demo.dto.Greetings;
 import com.quartz.demo.dto.QuartzTaskError;
 import com.quartz.demo.service.QuartzService;
 import com.quartz.demo.service.QuartzServiceImpl;
+import com.quartz.demo.service.kafka.GreetingsService;
 import com.quartz.demo.util.enums.SendType;
 
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 @DisallowConcurrentExecution
 @Slf4j
 public class QuartzMainJobFactory implements Job {
-	@Autowired
-	private KafkaTemplate kafkaTemplate;
 
+	@Autowired
+	private GreetingsService greetingsService;
+	
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 		JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
@@ -75,10 +77,13 @@ public class QuartzMainJobFactory implements Job {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public void sendMessage(String message) {
-		this.kafkaTemplate.send("QUARTZ_TOPIC", message);
-		log.info("kafka message={}", message);
+
+		Greetings greetings = Greetings.builder()
+	            .message(message)
+	            .timestamp(System.currentTimeMillis())
+	            .build();
+	        greetingsService.sendGreeting(greetings);
 	}
 
 }

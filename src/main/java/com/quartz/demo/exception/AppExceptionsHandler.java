@@ -20,7 +20,7 @@ public class AppExceptionsHandler {
 	public ResponseEntity<Object> handleUserServiceException(CustomSchedulerServiceException ex, WebRequest request) {
 		ErrorMessage errorMessage = new ErrorMessage(ex.getMessage());
 		log.error(ex.getMessage(), ex);
-		return new ResponseEntity<>(errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(errorMessage, new HttpHeaders(), HttpStatus.BAD_REQUEST);
 	}
 
 	

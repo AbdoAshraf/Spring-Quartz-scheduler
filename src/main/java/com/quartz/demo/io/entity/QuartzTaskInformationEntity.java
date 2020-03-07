@@ -1,5 +1,6 @@
 package com.quartz.demo.io.entity;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.quartz.demo.dto.QuartzTaskError;
 import com.quartz.demo.util.enums.JobStatus;
 import com.quartz.demo.util.enums.SendType;
 
@@ -22,7 +24,8 @@ import lombok.Setter;
 @Data
 @Entity
 
-public class QuartzTaskInformationEntity {
+public class QuartzTaskInformationEntity implements Serializable{
+	private static final long serialVersionUID = 5313493413859894403L;
 
 	@Id
 	@GeneratedValue

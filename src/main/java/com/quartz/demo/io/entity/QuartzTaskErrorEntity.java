@@ -1,5 +1,7 @@
 package com.quartz.demo.io.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -13,7 +15,9 @@ import lombok.Setter;
 @Data
 
 @Entity
-public class QuartzTaskErrorEntity {
+public class QuartzTaskErrorEntity implements Serializable{
+	private static final long serialVersionUID = -3151715408586880484L;
+
 	@Id
 	@GeneratedValue
 	private long id;

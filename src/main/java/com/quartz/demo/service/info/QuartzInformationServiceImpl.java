@@ -3,6 +3,9 @@ package com.quartz.demo.service.info;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.FetchType;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -42,8 +45,11 @@ public class QuartzInformationServiceImpl implements QuartzInformationService {
 		if (this.quartzTaskInformationRepo.findByTaskId(quartzTaskInformation.getTaskId()) ==null)
 			throw new InfoServiceExcseption("invalid task id");
 			
-		QuartzTaskInformationEntity entity = this.modelMapper.map(quartzTaskInformation,
-				QuartzTaskInformationEntity.class);
+		QuartzTaskInformationEntity entity = this.quartzTaskInformationRepo.findByTaskId(quartzTaskInformation.getTaskId());
+		entity.setFrozenTime(quartzTaskInformation.getFrozenTime());
+		entity.setLastmodifyTime(quartzTaskInformation.getLastmodifyTime());
+		entity.setJobStatus(quartzTaskInformation.getJobStatus());
+		entity.setUnfrozenTime(quartzTaskInformation.getUnfrozenTime());
 		entity = this.quartzTaskInformationRepo.save(entity);
 		return this.modelMapper.map(entity, QuartzTaskInformation.class);
 	}
@@ -56,16 +62,12 @@ public class QuartzInformationServiceImpl implements QuartzInformationService {
 	}
 
 	@Override
-	public void recordError(Exception e, String taskId) {
+	public void recordError(QuartzTaskError quartzTaskError, String taskId) {
 		if (this.quartzTaskInformationRepo.findByTaskId(taskId) ==null)
 				throw new InfoServiceExcseption("invalid task id recordError");
 		QuartzTaskInformationEntity entity=this.quartzTaskInformationRepo.findByTaskId(taskId);
 		entity.setFailCount(entity.getFailCount()+1);
-		QuartzTaskError quartzTaskError= new QuartzTaskError();
-		quartzTaskError.setErrorId(UUID.randomUUID().toString());
-		quartzTaskError.setExecuteTime(LocalDateTime.now());
-		quartzTaskError.setFailReason(e.getMessage());
-		entity.getQuartzTaskErrorsList().add(this.modelMapper.map(quartzTaskError, QuartzTaskErrorEntity.class));
+		this.quartzTaskInformationRepo.save(entity);
 	}
 
 }

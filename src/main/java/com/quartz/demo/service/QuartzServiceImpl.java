@@ -46,6 +46,8 @@ public class QuartzServiceImpl implements QuartzService {
 	@Override
 	public boolean freezJob(String jobId) throws CustomSchedulerServiceException {
 		QuartzTaskInformation quartzTaskInformation = this.quartzInformationService.getJobDetails(jobId);
+		if (quartzTaskInformation.getJobStatus() == JobStatus.FROZEN)
+			throw new CustomSchedulerServiceException("job already frozen");
 		try {
 			this.quartzSchedulerService.pausejob(quartzTaskInformation);
 		} catch (SchedulerException e) {
@@ -61,6 +63,9 @@ public class QuartzServiceImpl implements QuartzService {
 	@Override
 	public boolean ScheduleJob(String jobId) throws CustomSchedulerServiceException {
 		QuartzTaskInformation quartzTaskInformation = this.quartzInformationService.getJobDetails(jobId);
+		if (quartzTaskInformation.getJobStatus() == JobStatus.UNFROZEN)
+			throw new CustomSchedulerServiceException("job already active");
+		
 		try {
 			this.quartzSchedulerService.scheduleJob(quartzTaskInformation);
 		} catch (SchedulerException e) {
@@ -92,7 +97,7 @@ public class QuartzServiceImpl implements QuartzService {
 
 	@Override
 	public void recordError(QuartzTaskError quartzTaskError, String id) {
-		this.quartzInformationService.getJobDetails(id).getQuartzTaskErrorsList().add(quartzTaskError);
+		this.quartzInformationService.recordError(quartzTaskError, id);
 	}
 
 }

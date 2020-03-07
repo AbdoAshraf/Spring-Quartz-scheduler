@@ -1,5 +1,6 @@
 package com.quartz.demo.service.info;
 
+import com.quartz.demo.dto.QuartzTaskError;
 import com.quartz.demo.dto.QuartzTaskInformation;
 
 public interface QuartzInformationService {
@@ -10,5 +11,5 @@ public interface QuartzInformationService {
 
 	QuartzTaskInformation getJobDetails(String id);
 	
-	void recordError(Exception e, String id);
+	void recordError(QuartzTaskError quartzTaskError, String id);
 }

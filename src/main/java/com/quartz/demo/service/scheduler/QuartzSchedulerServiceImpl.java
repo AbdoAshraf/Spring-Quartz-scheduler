@@ -81,12 +81,14 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 		return flag;
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public boolean resumeJob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException {
 		this.resume(quartzTaskInformation.getTaskId(), this.scheduler.DEFAULT_GROUP);
 		return true;
 	}
 
+	@SuppressWarnings("static-access")
 	public boolean pausejob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException {
 		this.pause(quartzTaskInformation.getTaskId(), this.scheduler.DEFAULT_GROUP);
 		return true;

@@ -52,4 +52,19 @@ public class SchedulerController {
 
 	}
 
+	@PutMapping("/freez-job/{jobId}")
+	public ResponseEntity<ScheduleJobResponse> freezJob(@PathVariable String jobId) {
+		this.quartzService.freezJob(jobId);
+
+		return new ResponseEntity<>(new ScheduleJobResponse(jobId, "job freezed sucessfully"), HttpStatus.OK);
+
+	}
+
+	@PutMapping("/resume-job/{jobId}")
+	public ResponseEntity<ScheduleJobResponse> activateJob(@PathVariable String jobId) {
+		this.quartzService.ResumeJob(jobId);
+		return new ResponseEntity<>(new ScheduleJobResponse(jobId, "job resumed sucessfully"), HttpStatus.OK);
+
+	}
+
 }
