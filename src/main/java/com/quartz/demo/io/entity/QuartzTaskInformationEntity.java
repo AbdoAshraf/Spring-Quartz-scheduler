@@ -43,15 +43,12 @@ public class QuartzTaskInformationEntity implements Serializable {
 	private String cornExp;
 
 	private JobStatus jobStatus;
-
 	private LocalDateTime frozenTime;
 
 	private LocalDateTime unfrozenTime;
 
-	// creation date
 	private LocalDateTime createTime;
 
-	// l
 	private LocalDateTime lastmodifyTime;
 
 	private SendType sendType;
@@ -75,7 +72,7 @@ public class QuartzTaskInformationEntity implements Serializable {
 	private int intervalInSeconds = 0;
 
 	@JoinColumn
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL ,fetch = FetchType.EAGER)
 	List<QuartzTaskErrorEntity> quartzTaskErrorsList;
 
 }

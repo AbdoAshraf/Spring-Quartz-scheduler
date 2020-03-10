@@ -1,12 +1,14 @@
 package com.quartz.demo.service.scheduler;
 
 import org.quartz.CronScheduleBuilder;
+import org.quartz.CronTrigger;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
+import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
@@ -50,43 +52,46 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 		jobDataMap.put("sendType", quartzTaskInformation.getSendType().toString());
 		jobDataMap.put("url", quartzTaskInformation.getUrl());
 		jobDataMap.put("executeParameter", quartzTaskInformation.getExecuteParamter());
-		if (checkExists(jobName, jobGroup)) {
-			throw new CustomSchedulerServiceException(String.format("Job already active", jobName, jobGroup));
+		try {
+			if (checkExists(jobName, jobGroup)) {
+				throw new CustomSchedulerServiceException(String.format("Job already active", jobName, jobGroup));
+			}
+			TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
+			Trigger trigger = this.selectTrigger(triggerKey, quartzTaskInformation);
+			scheduler.scheduleJob(jobDetail, trigger);
+			String schedulerName = scheduler.getSchedulerName();
+			log.info("schedulerName:{},jobName:{},jobGroup:{},jobClass:{}", schedulerName, jobName, jobGroup);
+		} catch (SchedulerException e) {
+			throw e;
 		}
-		TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
-		Trigger trigger = this.selectTrigger(triggerKey, quartzTaskInformation);
-		scheduler.scheduleJob(jobDetail, trigger);
-		String schedulerName = scheduler.getSchedulerName();
-		log.info("schedulerName:{},jobName:{},jobGroup:{},jobClass:{}", schedulerName, jobName, jobGroup);
 	}
 
 	private Trigger selectTrigger(TriggerKey triggerKey, QuartzTaskInformation info) {
-		return TriggerType.valueOf(info.getTriggerType().toUpperCase()).readTrigger(triggerKey, info);
+		Trigger trigger;
+		if (info.getTriggerType().equals("corn")) {
+			trigger = setCronTrigger(triggerKey, info);
+		} else if (info.getTriggerType().equals("simple")) {
+			trigger = setSimpleTrigger(triggerKey, info);
+		} else {
+			trigger = setCronTrigger(triggerKey, info);
+		}
+		return trigger;
 	}
 
-	public enum TriggerType {
-		CRON {
-			@Override
-			Trigger readTrigger(TriggerKey triggerKey, QuartzTaskInformation info) {
-				int triggerPriority = info.getTriggerPriority();
-				triggerPriority = triggerPriority == 0 ? 5 : triggerPriority;
-				CronScheduleBuilder schedBuilder = CronScheduleBuilder.cronSchedule(info.getCornExp());
-				this.setCronMisFireType(info, schedBuilder);
-				return TriggerBuilder.newTrigger().withIdentity(triggerKey).withPriority(triggerPriority)
-						.withSchedule(schedBuilder).build();
-			}
-		},
-		SIMPLE {
-			@Override
-			Trigger readTrigger(TriggerKey triggerKey, QuartzTaskInformation info) {
-				SimpleScheduleBuilder simpleScheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
-						.withIntervalInSeconds(info.getIntervalInSeconds()).withRepeatCount(info.getRepeatCount());
-				this.setSimpleMisFireType(info, simpleScheduleBuilder);
-				return TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(simpleScheduleBuilder).build();
-			}
-		};
+	private CronTrigger setCronTrigger(TriggerKey triggerKey, QuartzTaskInformation info) {
+		int triggerPriority = info.getTriggerPriority();
+		triggerPriority = triggerPriority == 0 ? 5 : triggerPriority;
+		CronScheduleBuilder schedBuilder = CronScheduleBuilder.cronSchedule(info.getCornExp());
+		this.setCronMisFireType(info, schedBuilder);
+		return TriggerBuilder.newTrigger().withIdentity(triggerKey).withPriority(triggerPriority)
+				.withSchedule(schedBuilder).build();
+	}
 
-		abstract Trigger readTrigger(TriggerKey triggerKey, QuartzTaskInformation info);
+	private SimpleTrigger setSimpleTrigger(TriggerKey triggerKey, QuartzTaskInformation info) {
+		SimpleScheduleBuilder simpleScheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
+				.withIntervalInSeconds(info.getIntervalInSeconds()).withRepeatCount(info.getRepeatCount());
+		this.setSimpleMisFireType(info, simpleScheduleBuilder);
+		return TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(simpleScheduleBuilder).build();
 	}
 
 	private void setCronMisFireType(QuartzTaskInformation info, CronScheduleBuilder cronScheduleBuilder) {

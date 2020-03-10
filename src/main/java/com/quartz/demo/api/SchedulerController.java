@@ -19,7 +19,7 @@ import com.quartz.demo.api.payload.ScheduleJobResponse;
 import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.service.QuartzService;
 
-@RestController("/sc")
+@RestController
 public class SchedulerController {
 	private ModelMapper modelMapper;
 	private QuartzService quartzService;
@@ -30,7 +30,7 @@ public class SchedulerController {
 		this.quartzService = quartzServiceInformation;
 	}
 
-	@PostMapping()
+	@PostMapping("/add-job")
 	public ResponseEntity<ScheduleJobResponse> addJob(@RequestBody @Valid ScheduleJobRequest scheduleJobRequest) {
 		QuartzTaskInformation quartzTaskInformation = this.quartzService
 				.insertNewJob(this.modelMapper.map(scheduleJobRequest, QuartzTaskInformation.class));
@@ -40,26 +40,26 @@ public class SchedulerController {
 
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping("/get-job/{id}")
 	public ResponseEntity<JobDetailsResponse> getJob(@PathVariable String id) {
 		return new ResponseEntity<>(
 				this.modelMapper.map(this.quartzService.getJobDetails(id), JobDetailsResponse.class), HttpStatus.OK);
 	}
 
-	@PutMapping("/{jobId}/fire")
+	@PutMapping("/scedule-job/{jobId}")
 	public ResponseEntity<ScheduleJobResponse> addJob(@PathVariable String jobId) {
 		this.quartzService.ScheduleJob(jobId);
 		return new ResponseEntity<>(new ScheduleJobResponse(jobId, "job scheduled sucessfully"), HttpStatus.OK);
 
 	}
 
-	@PutMapping("/{jobId}/freez")
+	@PutMapping("/freez-job/{jobId}")
 	public ResponseEntity<ScheduleJobResponse> freezJob(@PathVariable String jobId) {
 		this.quartzService.freezJob(jobId);
 		return new ResponseEntity<>(new ScheduleJobResponse(jobId, "job freezed sucessfully"), HttpStatus.OK);
 	}
 
-	@PutMapping("{jobId}/resume")
+	@PutMapping("/resume-job/{jobId}")
 	public ResponseEntity<ScheduleJobResponse> activateJob(@PathVariable String jobId) {
 		this.quartzService.ResumeJob(jobId);
 		return new ResponseEntity<>(new ScheduleJobResponse(jobId, "job resumed sucessfully"), HttpStatus.OK);
