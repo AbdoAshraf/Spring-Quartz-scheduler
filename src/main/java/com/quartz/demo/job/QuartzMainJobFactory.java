@@ -28,7 +28,7 @@ public class QuartzMainJobFactory implements Job {
 
 	@Autowired
 	private GreetingsService greetingsService;
-	
+
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 		JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
@@ -79,11 +79,8 @@ public class QuartzMainJobFactory implements Job {
 
 	public void sendMessage(String message) {
 
-		Greetings greetings = Greetings.builder()
-	            .message(message)
-	            .timestamp(System.currentTimeMillis())
-	            .build();
-	        greetingsService.sendGreeting(greetings);
+		Greetings greetings = Greetings.builder().message(message).timestamp(System.currentTimeMillis()).build();
+		greetingsService.sendGreeting(greetings);
 	}
 
 }
