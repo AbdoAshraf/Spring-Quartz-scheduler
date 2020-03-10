@@ -1,5 +1,8 @@
 package com.quartz.demo.api;
 
+import static org.springframework.http.ResponseEntity.created;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.quartz.demo.api.payload.JobDetailsResponse;
 import com.quartz.demo.api.payload.ScheduleJobRequest;
@@ -31,12 +35,13 @@ public class SchedulerController {
 	}
 
 	@PostMapping("/add-job")
-	public ResponseEntity<ScheduleJobResponse> addJob(@RequestBody @Valid ScheduleJobRequest scheduleJobRequest) {
+	public ResponseEntity addJob(@RequestBody @Valid ScheduleJobRequest scheduleJobRequest,
+			HttpServletRequest request) {
 		QuartzTaskInformation quartzTaskInformation = this.quartzService
 				.insertNewJob(this.modelMapper.map(scheduleJobRequest, QuartzTaskInformation.class));
-		ScheduleJobResponse scheduleJobResponse = this.modelMapper.map(quartzTaskInformation,
-				ScheduleJobResponse.class);
-		return new ResponseEntity<>(scheduleJobResponse, HttpStatus.OK);
+
+		return created(ServletUriComponentsBuilder.fromContextPath(request).path("/get-job/{id}")
+				.buildAndExpand(quartzTaskInformation.getTaskId()).toUri()).build();
 
 	}
 

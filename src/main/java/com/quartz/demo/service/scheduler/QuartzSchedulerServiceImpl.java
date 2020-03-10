@@ -56,7 +56,7 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 			if (checkExists(jobName, jobGroup)) {
 				throw new CustomSchedulerServiceException(String.format("Job already active", jobName, jobGroup));
 			}
-			TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
+			TriggerKey triggerKey = TriggerKey.triggerKey(quartzTaskInformation.getTaskId(), jobGroup);
 			Trigger trigger = this.selectTrigger(triggerKey, quartzTaskInformation);
 			scheduler.scheduleJob(jobDetail, trigger);
 			String schedulerName = scheduler.getSchedulerName();
@@ -129,10 +129,10 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 		return true;
 	}
 
-	private boolean delete(String jobName, String jobGroup) throws SchedulerException {
+	private boolean delete(String jobId, String jobGroup) throws SchedulerException {
 		boolean flag = false;
-		if (checkExists(jobName, jobGroup)) {
-			TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
+		if (checkExists(jobId, jobGroup)) {
+			TriggerKey triggerKey = TriggerKey.triggerKey(jobId, jobGroup);
 			scheduler.pauseTrigger(triggerKey);
 			scheduler.unscheduleJob(triggerKey);
 			flag = true;
@@ -140,15 +140,12 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 		return flag;
 	}
 
-	private boolean resume(String jobName, String jobGroup) throws SchedulerException {
-		boolean flag = false;
-		if (checkExists(jobName, jobGroup)) {
-			TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
+	private void resume(String jobId, String jobGroup) throws SchedulerException {
+		if (checkExists(jobId, jobGroup)) {
+			TriggerKey triggerKey = TriggerKey.triggerKey(jobId, jobGroup);
 			scheduler.resumeTrigger(triggerKey);
-			// String schedulerName = scheduler.getSchedulerName();
-			flag = true;
 		}
-		return flag;
+		throw new CustomSchedulerServiceException("job not exisits");
 	}
 
 	@SuppressWarnings("static-access")
@@ -164,16 +161,15 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 		return true;
 	}
 
-	private boolean pause(String jobName, String jobGroup) throws SchedulerException {
-		boolean flag = false;
+	private void pause(String jobName, String jobGroup) throws SchedulerException {
 		TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
 		if (checkExists(jobName, jobGroup)) {
 			scheduler.pauseTrigger(triggerKey);
-			flag = true;
 			String schedulerName = scheduler.getSchedulerName();
-			log.info("schedulerName:{},jobName:{},jobGroup:{} 暂停成功", schedulerName, jobName, jobGroup);
+			log.info("schedulerName:{},jobName:{},jobGroup:{} freez", schedulerName, jobName, jobGroup);
+			return;
 		}
-		return flag;
+		throw new CustomSchedulerServiceException("job not exisits");
 	}
 
 	private boolean checkExists(String jobName, String jobGroup) throws SchedulerException {

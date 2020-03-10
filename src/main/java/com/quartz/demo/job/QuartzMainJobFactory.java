@@ -13,11 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import com.quartz.demo.config.ApplicationContextHolder;
-import com.quartz.demo.dto.Greetings;
-import com.quartz.demo.dto.QuartzTaskError;
+import com.quartz.demo.dto.QuartzTaskEvent;
 import com.quartz.demo.service.QuartzService;
 import com.quartz.demo.service.QuartzServiceImpl;
-import com.quartz.demo.service.kafka.GreetingsService;
+import com.quartz.demo.service.messaging.GreetingsService;
+import com.quartz.demo.stream.Greetings;
+import com.quartz.demo.util.enums.EventType;
 import com.quartz.demo.util.enums.SendType;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,7 @@ public class QuartzMainJobFactory implements Job {
 
 	@Autowired
 	private GreetingsService greetingsService;
-	
+
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 		JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
@@ -43,7 +44,7 @@ public class QuartzMainJobFactory implements Job {
 		QuartzService quartzService = (QuartzServiceImpl) ApplicationContextHolder.getBean("quartzServiceImpl");
 		// QuartzTaskInformation records = quartzService.getJobDetails(id)
 
-		QuartzTaskError quartzTaskError = new QuartzTaskError();
+		QuartzTaskEvent quartzTaskError = new QuartzTaskEvent();
 		if (sendType.equals(SendType.URL.toString())) {
 			try {
 				RestTemplate restTemplate = new RestTemplate();
@@ -51,13 +52,13 @@ public class QuartzMainJobFactory implements Job {
 				log.info("id={},taskName={},sendtype={}url", id, taskName, sendType);
 				if (response.getStatusCode() != HttpStatus.OK) {
 					quartzTaskError.setExecuteTime(LocalDateTime.now());
-					quartzTaskError.setFailReason(response.toString());
+					quartzTaskError.setReason(response.toString());
 					quartzService.recordError(quartzTaskError, id);
 					log.error("id={},taskName={},message={}", id, taskName, response);
 				}
 			} catch (Exception ex) {
 				quartzTaskError.setExecuteTime(LocalDateTime.now());
-				quartzTaskError.setFailReason(ex.getMessage());
+				quartzTaskError.setReason(ex.getMessage());
 				quartzService.recordError(quartzTaskError, id);
 				log.error("id={},taskName={},message={}", id, taskName, ex.getMessage());
 			}
@@ -69,8 +70,9 @@ public class QuartzMainJobFactory implements Job {
 				this.sendMessage(message);
 				log.info("id={},taskName={},sendtype={}url", id, taskName, sendType);
 			} catch (Exception ex) {
+				quartzTaskError.setEventType(EventType.Error);
 				quartzTaskError.setExecuteTime(LocalDateTime.now());
-				quartzTaskError.setFailReason(ex.getMessage());
+				quartzTaskError.setReason(ex.getMessage());
 				quartzService.recordError(quartzTaskError, id);
 				log.error("id={},taskName={},message={}", id, taskName, ex.getMessage());
 			}
@@ -79,11 +81,8 @@ public class QuartzMainJobFactory implements Job {
 
 	public void sendMessage(String message) {
 
-		Greetings greetings = Greetings.builder()
-	            .message(message)
-	            .timestamp(System.currentTimeMillis())
-	            .build();
-	        greetingsService.sendGreeting(greetings);
+		Greetings greetings = Greetings.builder().message(message).timestamp(System.currentTimeMillis()).build();
+		greetingsService.sendGreeting(greetings);
 	}
 
 }

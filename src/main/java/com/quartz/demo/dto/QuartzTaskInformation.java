@@ -1,10 +1,8 @@
 package com.quartz.demo.dto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.quartz.demo.util.enums.CronMisfire;
-import com.quartz.demo.util.enums.JobStatus;
 import com.quartz.demo.util.enums.SendType;
 import com.quartz.demo.util.enums.SimpleMisfire;
 
@@ -17,43 +15,58 @@ import lombok.Setter;
 @Data
 public class QuartzTaskInformation {
 	private String taskId;
-	
+
 	private String taskName;
 
-	private String cornExp;
+	List<QuartzTaskEvent> quartzTaskErrorsList;
 
-	private JobStatus jobStatus;
+	QuartzTaskConfig quartzTaskConfig;
 
-	private LocalDateTime frozenTime;
+	QartzTaskAnalytics qartzTaskAnalytics;
 
-	private LocalDateTime unfrozenTime;
+	public QuartzTaskInformation() {
+		qartzTaskAnalytics = new QartzTaskAnalytics();
+		quartzTaskConfig = new QuartzTaskConfig();
+	}
 
-	private LocalDateTime createTime;
+	public SendType getSendType() {
+		return this.quartzTaskConfig.getSendType();
+	}
 
-	private LocalDateTime lastmodifyTime;
+	public String getUrl() {
+		return this.quartzTaskConfig.getUrl();
+	}
 
-	private SendType sendType;
-	
-	private String triggerType;
-	
-	private int triggerPriority;
-	
-	private SimpleMisfire simpleMisfire;
-	
-	private CronMisfire cronMisfire;
-	
-	private int intervalInSeconds = 0;
-	
-	private int repeatCount=0;
-	
-	private String url;
+	public String getCornExp() {
+		return this.quartzTaskConfig.getCornExp();
+	}
 
-	private String executeParamter;
-	
-	private long sucssesCount;
-	
-	private long failCount;
-	
-	List<QuartzTaskError> quartzTaskErrorsList;
+	public String getExecuteParamter() {
+		return this.quartzTaskConfig.getExecuteParamter();
+	}
+
+	public String getTriggerType() {
+		return this.quartzTaskConfig.getTriggerType();
+	}
+
+	public CronMisfire getCronMisfire() {
+		return this.quartzTaskConfig.getCronMisfire();
+	}
+
+	public int getIntervalInSeconds() {
+		return this.quartzTaskConfig.getIntervalInSeconds();
+	}
+
+	public int getTriggerPriority() {
+		return this.quartzTaskConfig.getTriggerPriority();
+	}
+
+	public int getRepeatCount() {
+		return this.getRepeatCount();
+	}
+
+	public SimpleMisfire getSimpleMisfire() {
+		return this.quartzTaskConfig.getSimpleMisfire();
+	}
 
 }
