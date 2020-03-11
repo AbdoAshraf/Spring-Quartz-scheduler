@@ -1,6 +1,8 @@
-package com.quartz.demo.api.payload;
+package com.quartz.demo.api.payload.response;
 
 import java.util.List;
+
+import com.quartz.demo.api.payload.JobDetails;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

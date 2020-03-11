@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.quartz.demo.api.payload.JobDetailsResponse;
-import com.quartz.demo.api.payload.ScheduleJobRequest;
-import com.quartz.demo.api.payload.ScheduleJobResponse;
+import com.quartz.demo.api.payload.request.ScheduleJobRequest;
+import com.quartz.demo.api.payload.response.JobDetailsResponse;
+import com.quartz.demo.api.payload.response.ScheduleJobResponse;
 import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.service.QuartzService;
 
