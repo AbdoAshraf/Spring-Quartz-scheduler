@@ -1,4 +1,4 @@
-package com.quartz.demo.dto;
+package com.quartz.demo.stream;
 
 import lombok.Builder;
 import lombok.Getter;

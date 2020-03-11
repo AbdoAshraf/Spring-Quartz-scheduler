@@ -1,4 +1,4 @@
-package com.quartz.demo.service.kafka;
+package com.quartz.demo.service.messaging;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
@@ -7,7 +7,7 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
 
-import com.quartz.demo.dto.Greetings;
+import com.quartz.demo.stream.Greetings;
 import com.quartz.demo.stream.GreetingsStreams;
 
 import lombok.extern.slf4j.Slf4j;

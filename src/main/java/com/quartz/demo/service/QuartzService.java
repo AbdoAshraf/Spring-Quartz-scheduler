@@ -1,6 +1,6 @@
 package com.quartz.demo.service;
 
-import com.quartz.demo.dto.QuartzTaskError;
+import com.quartz.demo.dto.QuartzTaskEvent;
 import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.exception.CustomSchedulerServiceException;
 
@@ -18,7 +18,7 @@ public interface QuartzService {
 	
 	boolean ResumeJob(String jobId)throws CustomSchedulerServiceException;
 
-	void recordError(QuartzTaskError quartzTaskError, String id);
+	void recordError(QuartzTaskEvent quartzTaskError, String id);
 
 	
 
