@@ -10,7 +10,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public abstract class JobDetails {
-
 	@NotNull
 	private String taskname;
 	QuartzTaskConfig quartzTaskConfig;

@@ -7,8 +7,11 @@ import org.springframework.stereotype.Service;
 import com.quartz.demo.dto.QuartzTaskEvent;
 import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.exception.CustomSchedulerServiceException;
+import com.quartz.demo.exception.ValidationException;
 import com.quartz.demo.service.info.QuartzInformationService;
 import com.quartz.demo.service.scheduler.QuartzSchedulerService;
+import com.quartz.demo.stream.TriggerType;
+import com.quartz.demo.util.enums.SendType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +30,21 @@ public class QuartzServiceImpl implements QuartzService {
 
 	@Override
 	public QuartzTaskInformation insertNewJob(QuartzTaskInformation quartzTaskInformation) {
+		this.validate(quartzTaskInformation);
 		return this.quartzInformationService.insertNewJob(quartzTaskInformation);
+	}
+
+	private void validate(QuartzTaskInformation quartzTaskInformation) throws ValidationException {
+		if (quartzTaskInformation.getSendType() == SendType.URL && quartzTaskInformation.getUrl() == null) {
+			throw new ValidationException("messing url");
+		}
+		if (quartzTaskInformation.getTriggerType() == TriggerType.CORN && quartzTaskInformation.getCornExp() == null) {
+			throw new ValidationException("messing corn exp");
+		}
+		if (quartzTaskInformation.getTriggerType() == TriggerType.Simple
+				&& quartzTaskInformation.getIntervalInSeconds() == 0) {
+			throw new ValidationException("messing time interval");
+		}
 	}
 
 	@Override
@@ -74,7 +91,6 @@ public class QuartzServiceImpl implements QuartzService {
 			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
 
 		}
-		// this.quartzInformationService.updateJobStatus(jobId, JobStatus.UNFROZEN);
 		return true;
 	}
 

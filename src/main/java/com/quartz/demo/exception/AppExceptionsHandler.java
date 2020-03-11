@@ -35,6 +35,14 @@ public class AppExceptionsHandler {
 		return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
 	}
 
+	@ExceptionHandler(value = { ValidationException.class })
+	public ResponseEntity<Object> handleValidationException(ValidationException ex, WebRequest request) {
+		Map<String, Object> body = new LinkedHashMap<>();
+		body.put("timestamp", LocalDateTime.now());
+		body.put("message", ex.getMessage());
+		return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+	}
+
 	@ExceptionHandler(value = { Exception.class })
 	public ResponseEntity<Object> handleOtherExceptions(Exception ex, WebRequest request) {
 		ErrorMessage errorMessage = new ErrorMessage(ex.getMessage());

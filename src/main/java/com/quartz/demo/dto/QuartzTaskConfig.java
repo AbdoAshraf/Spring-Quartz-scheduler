@@ -1,5 +1,6 @@
 package com.quartz.demo.dto;
 
+import com.quartz.demo.stream.TriggerType;
 import com.quartz.demo.util.enums.CronMisfire;
 import com.quartz.demo.util.enums.SendType;
 import com.quartz.demo.util.enums.SimpleMisfire;
@@ -25,7 +26,7 @@ public class QuartzTaskConfig {
 
 	private String executeParamter;
 
-	private String triggerType;
+	private TriggerType triggerType;
 
 	private int triggerPriority;
 

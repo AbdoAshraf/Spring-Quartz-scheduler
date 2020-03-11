@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.exception.CustomSchedulerServiceException;
 import com.quartz.demo.jobfactory.QuartzMainJobFactory;
+import com.quartz.demo.stream.TriggerType;
 import com.quartz.demo.util.enums.CronMisfire;
 import com.quartz.demo.util.enums.SimpleMisfire;
 
@@ -74,9 +75,9 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 
 	private Trigger selectTrigger(TriggerKey triggerKey, QuartzTaskInformation info) {
 		Trigger trigger;
-		if (info.getTriggerType().equals("corn")) {
+		if (info.getTriggerType() == TriggerType.CORN) {
 			trigger = setCronTrigger(triggerKey, info);
-		} else if (info.getTriggerType().equals("simple")) {
+		} else if (info.getTriggerType() == TriggerType.Simple) {
 			trigger = setSimpleTrigger(triggerKey, info);
 		} else {
 			trigger = setCronTrigger(triggerKey, info);

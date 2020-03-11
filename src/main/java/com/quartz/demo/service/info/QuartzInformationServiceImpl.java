@@ -12,6 +12,7 @@ import com.quartz.demo.exception.InfoServiceExcseption;
 import com.quartz.demo.io.entity.QuartzTaskEventEntity;
 import com.quartz.demo.io.entity.QuartzTaskInformationEntity;
 import com.quartz.demo.io.repo.QuartzTaskInformationRepo;
+import com.quartz.demo.util.enums.EventType;
 import com.quartz.demo.util.enums.JobStatus;
 
 @Service
@@ -51,8 +52,10 @@ public class QuartzInformationServiceImpl implements QuartzInformationService {
 	@Override
 	public void recordError(QuartzTaskEvent quartzTaskError, String taskId) {
 		QuartzTaskInformationEntity entity = getJob(taskId);
-		long count = entity.getFailCount() + 1;
-		entity.setFailCount(count);
+		if (quartzTaskError.getEventType() == EventType.Error) {
+			long count = entity.getFailCount() + 1;
+			entity.setFailCount(count);
+		}
 		entity.getQuartzTaskEventsList().add(this.modelMapper.map(quartzTaskError, QuartzTaskEventEntity.class));
 		this.quartzTaskInformationRepo.save(entity);
 	}

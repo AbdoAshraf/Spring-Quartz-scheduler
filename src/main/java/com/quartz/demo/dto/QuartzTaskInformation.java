@@ -2,6 +2,7 @@ package com.quartz.demo.dto;
 
 import java.util.List;
 
+import com.quartz.demo.stream.TriggerType;
 import com.quartz.demo.util.enums.CronMisfire;
 import com.quartz.demo.util.enums.JobStatus;
 import com.quartz.demo.util.enums.SendType;
@@ -47,7 +48,7 @@ public class QuartzTaskInformation {
 		return this.quartzTaskConfig.getExecuteParamter();
 	}
 
-	public String getTriggerType() {
+	public TriggerType getTriggerType() {
 		return this.quartzTaskConfig.getTriggerType();
 	}
 
