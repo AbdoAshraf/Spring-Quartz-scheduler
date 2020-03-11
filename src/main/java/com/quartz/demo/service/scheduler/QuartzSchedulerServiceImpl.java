@@ -18,9 +18,9 @@ import org.springframework.stereotype.Service;
 import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.exception.CustomSchedulerServiceException;
 import com.quartz.demo.jobfactory.QuartzMainJobFactory;
-import com.quartz.demo.stream.TriggerType;
 import com.quartz.demo.util.enums.CronMisfire;
 import com.quartz.demo.util.enums.SimpleMisfire;
+import com.quartz.demo.util.enums.TriggerType;
 
 import lombok.extern.slf4j.Slf4j;
 

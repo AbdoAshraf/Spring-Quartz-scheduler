@@ -10,8 +10,8 @@ import com.quartz.demo.exception.CustomSchedulerServiceException;
 import com.quartz.demo.exception.ValidationException;
 import com.quartz.demo.service.info.QuartzInformationService;
 import com.quartz.demo.service.scheduler.QuartzSchedulerService;
-import com.quartz.demo.stream.TriggerType;
 import com.quartz.demo.util.enums.SendType;
+import com.quartz.demo.util.enums.TriggerType;
 
 import lombok.extern.slf4j.Slf4j;
 

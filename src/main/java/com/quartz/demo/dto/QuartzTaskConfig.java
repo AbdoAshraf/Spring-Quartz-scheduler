@@ -1,9 +1,9 @@
 package com.quartz.demo.dto;
 
-import com.quartz.demo.stream.TriggerType;
 import com.quartz.demo.util.enums.CronMisfire;
 import com.quartz.demo.util.enums.SendType;
 import com.quartz.demo.util.enums.SimpleMisfire;
+import com.quartz.demo.util.enums.TriggerType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
