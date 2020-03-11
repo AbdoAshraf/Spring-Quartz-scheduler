@@ -3,6 +3,7 @@ package com.quartz.demo.dto;
 import java.util.List;
 
 import com.quartz.demo.util.enums.CronMisfire;
+import com.quartz.demo.util.enums.JobStatus;
 import com.quartz.demo.util.enums.SendType;
 import com.quartz.demo.util.enums.SimpleMisfire;
 
@@ -18,14 +19,15 @@ public class QuartzTaskInformation {
 
 	private String taskName;
 
-	List<QuartzTaskEvent> quartzTaskErrorsList;
+	List<QuartzTaskEvent> quartzTaskEventsList;
 
 	QuartzTaskConfig quartzTaskConfig;
 
-	QartzTaskAnalytics qartzTaskAnalytics;
+	private JobStatus jobStatus;
+
+	private long failCount;
 
 	public QuartzTaskInformation() {
-		qartzTaskAnalytics = new QartzTaskAnalytics();
 		quartzTaskConfig = new QuartzTaskConfig();
 	}
 

@@ -16,7 +16,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QartzTaskAnalytics {
-	private JobStatus jobStatus;
 
 	private LocalDateTime frozenTime;
 
@@ -26,6 +25,7 @@ public class QartzTaskAnalytics {
 
 	private long sucssesCount;
 
+	private JobStatus jobStatus;
 	private long failCount;
 
 }

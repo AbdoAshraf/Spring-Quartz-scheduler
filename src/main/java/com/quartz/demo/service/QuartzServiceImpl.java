@@ -9,7 +9,6 @@ import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.exception.CustomSchedulerServiceException;
 import com.quartz.demo.service.info.QuartzInformationService;
 import com.quartz.demo.service.scheduler.QuartzSchedulerService;
-import com.quartz.demo.util.enums.JobStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,7 +48,7 @@ public class QuartzServiceImpl implements QuartzService {
 		} catch (SchedulerException e) {
 			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
 		}
-		this.quartzInformationService.updateJobStatus(jobId, JobStatus.FROZEN);
+		// this.quartzInformationService.updateJobStatus(jobId, JobStatus.FROZEN);
 		return true;
 	}
 
@@ -61,7 +60,7 @@ public class QuartzServiceImpl implements QuartzService {
 		} catch (SchedulerException e) {
 			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
 		}
-		this.quartzInformationService.updateJobStatus(jobId, JobStatus.UNFROZEN);
+		// this.quartzInformationService.updateJobStatus(jobId, JobStatus.UNFROZEN);
 		return true;
 
 	}
@@ -75,7 +74,7 @@ public class QuartzServiceImpl implements QuartzService {
 			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
 
 		}
-		this.quartzInformationService.updateJobStatus(jobId, JobStatus.UNFROZEN);
+		// this.quartzInformationService.updateJobStatus(jobId, JobStatus.UNFROZEN);
 		return true;
 	}
 

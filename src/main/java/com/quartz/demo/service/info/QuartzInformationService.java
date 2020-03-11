@@ -2,7 +2,6 @@ package com.quartz.demo.service.info;
 
 import com.quartz.demo.dto.QuartzTaskEvent;
 import com.quartz.demo.dto.QuartzTaskInformation;
-import com.quartz.demo.util.enums.JobStatus;
 
 public interface QuartzInformationService {
 
@@ -14,5 +13,4 @@ public interface QuartzInformationService {
 
 	void recordError(QuartzTaskEvent quartzTaskError, String id);
 
-	void updateJobStatus(String jobId, JobStatus jobStatus);
 }

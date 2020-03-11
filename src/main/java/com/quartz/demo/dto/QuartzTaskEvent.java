@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.quartz.demo.util.enums.EventType;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import lombok.Setter;
 @Setter
 @Data
 @NoArgsConstructor
-
+@AllArgsConstructor
 public class QuartzTaskEvent {
 
 	private String errorId;
@@ -22,6 +23,5 @@ public class QuartzTaskEvent {
 
 	private LocalDateTime executeTime;
 
-	private String reason;
-
+	private String cause;
 }

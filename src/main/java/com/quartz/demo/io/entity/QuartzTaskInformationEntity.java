@@ -5,10 +5,14 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+
+import com.quartz.demo.util.enums.JobStatus;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,8 +20,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-public class QuartzTaskInformationEntity extends AbstractAuditableEntity<Long> {
+public class QuartzTaskInformationEntity {
 	private static final long serialVersionUID = 5313493413859894403L;
+
+	@Id
+	@GeneratedValue
+	private long id;
 
 	@Column(nullable = false)
 	private String taskId;
@@ -25,22 +33,17 @@ public class QuartzTaskInformationEntity extends AbstractAuditableEntity<Long> {
 	@Column(nullable = false)
 	private String taskName;
 
+	@Column(nullable = false)
+	private JobStatus jobStatus;
+
+	@Column(nullable = false)
+	long failCount;
 	@JoinColumn
-	@OneToMany(cascade = CascadeType.ALL)
-	List<QuartzTaskEventEntity> quartzTaskErrorsList;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	List<QuartzTaskEventEntity> quartzTaskEventsList;
 
 	@JoinColumn
 	@OneToOne(cascade = CascadeType.ALL)
 	QuartzTaskConfigEntity quartzTaskConfig;
-
-	@JoinColumn
-	@OneToOne(cascade = CascadeType.ALL)
-	QartzTaskAnalyticsEntity qartzTaskAnalytics;
-
-	@Override
-	@GeneratedValue
-	public Long getId() {
-		return id;
-	}
 
 }

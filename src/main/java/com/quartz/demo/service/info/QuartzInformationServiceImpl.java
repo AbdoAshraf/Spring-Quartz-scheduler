@@ -1,6 +1,5 @@
 package com.quartz.demo.service.info;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.quartz.demo.dto.QuartzTaskEvent;
 import com.quartz.demo.dto.QuartzTaskInformation;
 import com.quartz.demo.exception.InfoServiceExcseption;
-import com.quartz.demo.io.entity.QartzTaskAnalyticsEntity;
 import com.quartz.demo.io.entity.QuartzTaskEventEntity;
 import com.quartz.demo.io.entity.QuartzTaskInformationEntity;
 import com.quartz.demo.io.repo.QuartzTaskInformationRepo;
@@ -33,29 +31,16 @@ public class QuartzInformationServiceImpl implements QuartzInformationService {
 		QuartzTaskInformationEntity entity = this.modelMapper.map(quartzTaskInformation,
 				QuartzTaskInformationEntity.class);
 		entity.setTaskId(UUID.randomUUID().toString());
-		entity.getQartzTaskAnalytics().setJobStatus(JobStatus.FROZEN);
-		entity.getQartzTaskAnalytics().setFrozenTime(LocalDateTime.now());
+		entity.setJobStatus(JobStatus.FROZEN);
+		// entity.getQartzTaskAnalytics().setFrozenTime(LocalDateTime.now());
 		entity = this.quartzTaskInformationRepo.save(entity);
 		return this.modelMapper.map(entity, QuartzTaskInformation.class);
 	}
 
 	@Override
-	public void updateJobStatus(String taskId, JobStatus jobStatus) {
-		QuartzTaskInformationEntity entity = this.getJob(taskId);
-		QartzTaskAnalyticsEntity quartzAnalyticsEntity = entity.getQartzTaskAnalytics();
-		if (jobStatus == JobStatus.FROZEN)
-			quartzAnalyticsEntity.setFrozenTime(LocalDateTime.now());
-		else
-			quartzAnalyticsEntity.setUnfrozenTime(LocalDateTime.now());
-		quartzAnalyticsEntity.setJobStatus(jobStatus);
-
-		this.quartzTaskInformationRepo.save(entity);
-	}
-
-	@Override
 	public QuartzTaskInformation getJobDetails(String id) {
 		return this.modelMapper.map(this.quartzTaskInformationRepo.findByTaskId(id)
-				.orElseThrow(()-> new InfoServiceExcseption("invalid task id")), QuartzTaskInformation.class);
+				.orElseThrow(() -> new InfoServiceExcseption("invalid task id")), QuartzTaskInformation.class);
 	}
 
 	private QuartzTaskInformationEntity getJob(String id) {
@@ -66,9 +51,9 @@ public class QuartzInformationServiceImpl implements QuartzInformationService {
 	@Override
 	public void recordError(QuartzTaskEvent quartzTaskError, String taskId) {
 		QuartzTaskInformationEntity entity = getJob(taskId);
-		long count = entity.getQartzTaskAnalytics().getFailCount() + 1;
-		entity.getQartzTaskAnalytics().setFailCount(count);
-		entity.getQuartzTaskErrorsList().add(this.modelMapper.map(quartzTaskError, QuartzTaskEventEntity.class));
+		long count = entity.getFailCount() + 1;
+		entity.setFailCount(count);
+		entity.getQuartzTaskEventsList().add(this.modelMapper.map(quartzTaskError, QuartzTaskEventEntity.class));
 		this.quartzTaskInformationRepo.save(entity);
 	}
 

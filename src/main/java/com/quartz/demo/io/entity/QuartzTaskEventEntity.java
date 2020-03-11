@@ -1,10 +1,9 @@
 package com.quartz.demo.io.entity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import com.quartz.demo.util.enums.EventType;
@@ -12,6 +11,7 @@ import com.quartz.demo.util.enums.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
@@ -19,19 +19,17 @@ import lombok.Setter;
 @Data
 @Entity
 @AllArgsConstructor
-public class QuartzTaskEventEntity implements Serializable {
-	private static final long serialVersionUID = -3151715408586880484L;
+@NoArgsConstructor
+
+public class QuartzTaskEventEntity {
 
 	@Id
-	@GeneratedValue
-	private long id;
+	@Column(nullable = false)
+	private String errorId;
 
 	private EventType eventType;
 
-	private String errorId;
-
 	private LocalDateTime executeTime;
 
-	private String reason;
-
+	private String cause;
 }

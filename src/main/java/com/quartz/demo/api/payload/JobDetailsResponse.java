@@ -12,6 +12,6 @@ import lombok.Setter;
 public class JobDetailsResponse extends JobDetails {
 
 	private String taskId;
-	private List<QuartzTaskErrorResponse> quartzTaskErrorsList;
+	private List<QuartzTaskErrorResponse> quartzTaskEventsList;
 
 }
