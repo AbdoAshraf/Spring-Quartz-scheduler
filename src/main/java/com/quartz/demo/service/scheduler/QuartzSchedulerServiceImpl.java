@@ -15,17 +15,19 @@ import org.quartz.TriggerKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.quartz.demo.dto.QuartzTaskInformation;
+import com.quartz.demo.dto.QuartzTaskInformationDTO;
 import com.quartz.demo.exception.CustomSchedulerServiceException;
 import com.quartz.demo.jobfactory.QuartzMainJobFactory;
 import com.quartz.demo.util.enums.CronMisfire;
 import com.quartz.demo.util.enums.SimpleMisfire;
 import com.quartz.demo.util.enums.TriggerType;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@NoArgsConstructor
 public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 
 	private Scheduler scheduler;
@@ -36,44 +38,48 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 	}
 
 	@Override
-	public boolean scheduleJob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException {
-		this.addJob(quartzTaskInformation);
+	public boolean scheduleJob(QuartzTaskInformationDTO quartzTaskInformationDTO) throws CustomSchedulerServiceException {
+		try {
+			this.addJob(quartzTaskInformationDTO);
+		} catch (SchedulerException e) {
+			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
+		}
 		return true;
 	}
 
-	private void addJob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException {
+	private void addJob(QuartzTaskInformationDTO quartzTaskInformationDTO) throws SchedulerException {
 		String jobGroup = Scheduler.DEFAULT_GROUP;
-		TriggerKey triggerKey = TriggerKey.triggerKey(quartzTaskInformation.getTaskId(), jobGroup);
+		TriggerKey triggerKey = TriggerKey.triggerKey(quartzTaskInformationDTO.getTaskId(), jobGroup);
 		if (checkExists(triggerKey)) {
 			throw new CustomSchedulerServiceException(
-					String.format("Job already active", quartzTaskInformation.getTaskName(), jobGroup));
+					String.format("Job already active", quartzTaskInformationDTO.getTaskName(), jobGroup));
 		}
-		JobDetail jobDetail = buildJob(quartzTaskInformation);
+		JobDetail jobDetail = buildJob(quartzTaskInformationDTO);
 		try {
-			Trigger trigger = this.selectTrigger(triggerKey, quartzTaskInformation);
+			Trigger trigger = this.selectTrigger(triggerKey, quartzTaskInformationDTO);
 			scheduler.scheduleJob(jobDetail, trigger);
 			String schedulerName = scheduler.getSchedulerName();
 			log.info("schedulerName:{},jobName:{},jobGroup:{},jobClass:{}", schedulerName,
-					quartzTaskInformation.getTaskName(), jobGroup);
+					quartzTaskInformationDTO.getTaskName(), jobGroup);
 		} catch (SchedulerException e) {
 			throw e;
 		}
 	}
 
-	private JobDetail buildJob(QuartzTaskInformation quartzTaskInformation) {
+	private JobDetail buildJob(QuartzTaskInformationDTO quartzTaskInformationDTO) {
 		JobDetail jobDetail = JobBuilder.newJob(QuartzMainJobFactory.class)
-				.withDescription(quartzTaskInformation.getExecuteParamter())
-				.withIdentity(quartzTaskInformation.getTaskId(), Scheduler.DEFAULT_GROUP).build();
+				.withDescription(quartzTaskInformationDTO.getExecuteParamter())
+				.withIdentity(quartzTaskInformationDTO.getTaskId(), Scheduler.DEFAULT_GROUP).build();
 		JobDataMap jobDataMap = jobDetail.getJobDataMap();
-		jobDataMap.put("id", quartzTaskInformation.getTaskId());
-		jobDataMap.put("name", quartzTaskInformation.getTaskName());
-		jobDataMap.put("sendType", quartzTaskInformation.getSendType().toString());
-		jobDataMap.put("url", quartzTaskInformation.getUrl());
-		jobDataMap.put("executeParameter", quartzTaskInformation.getExecuteParamter());
+		jobDataMap.put("id", quartzTaskInformationDTO.getTaskId());
+		jobDataMap.put("name", quartzTaskInformationDTO.getTaskName());
+		jobDataMap.put("sendType", quartzTaskInformationDTO.getSendType().toString());
+		jobDataMap.put("url", quartzTaskInformationDTO.getUrl());
+		jobDataMap.put("executeParameter", quartzTaskInformationDTO.getExecuteParamter());
 		return jobDetail;
 	}
 
-	private Trigger selectTrigger(TriggerKey triggerKey, QuartzTaskInformation info) {
+	private Trigger selectTrigger(TriggerKey triggerKey, QuartzTaskInformationDTO info) {
 		Trigger trigger;
 		if (info.getTriggerType() == TriggerType.CORN) {
 			trigger = setCronTrigger(triggerKey, info);
@@ -85,66 +91,87 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 		return trigger;
 	}
 
-	private CronTrigger setCronTrigger(TriggerKey triggerKey, QuartzTaskInformation info) {
+	private CronTrigger setCronTrigger(TriggerKey triggerKey, QuartzTaskInformationDTO info) {
 		int triggerPriority = info.getTriggerPriority();
 		triggerPriority = triggerPriority == 0 ? 5 : triggerPriority;
 		CronScheduleBuilder schedBuilder = CronScheduleBuilder.cronSchedule(info.getCornExp());
-		this.setCronMisFireType(info, schedBuilder);
+		this.setCronMisFireType(info.getCronMisfire(), schedBuilder);
 		return TriggerBuilder.newTrigger().withIdentity(triggerKey).withPriority(triggerPriority)
 				.withSchedule(schedBuilder).build();
 	}
 
-	private SimpleTrigger setSimpleTrigger(TriggerKey triggerKey, QuartzTaskInformation info) {
+	private SimpleTrigger setSimpleTrigger(TriggerKey triggerKey, QuartzTaskInformationDTO info) {
 		SimpleScheduleBuilder simpleScheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
 				.withIntervalInSeconds(info.getIntervalInSeconds()).withRepeatCount(info.getRepeatCount());
-		this.setSimpleMisFireType(info, simpleScheduleBuilder);
+		this.setSimpleMisFireType(info.getSimpleMisfire(), simpleScheduleBuilder);
 		return TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(simpleScheduleBuilder).build();
 	}
 
-	private void setCronMisFireType(QuartzTaskInformation info, CronScheduleBuilder cronScheduleBuilder) {
-		if (CronMisfire.DO_NOTHING == info.getCronMisfire())
+	private void setCronMisFireType(CronMisfire corn, CronScheduleBuilder cronScheduleBuilder) {
+		switch (String.valueOf(corn)) {
+		case "DO_NOTHING":
 			cronScheduleBuilder.withMisfireHandlingInstructionDoNothing();
-		else if (CronMisfire.FIRE_ONCE_NOW == info.getCronMisfire())
+			break;
+		case "FIRE_ONCE_NOW":
 			cronScheduleBuilder.withMisfireHandlingInstructionFireAndProceed();
-		else if (CronMisfire.IGNORE_MISFIRES == info.getCronMisfire())
+			break;
+		case "IGNORE_MISFIRES":
 			cronScheduleBuilder.withMisfireHandlingInstructionIgnoreMisfires();
-		else
+			break;
+		default:
 			cronScheduleBuilder.withMisfireHandlingInstructionDoNothing();
+			break;
+		}
 	}
 
-	private void setSimpleMisFireType(QuartzTaskInformation info, SimpleScheduleBuilder simpleScheduleBuilder) {
-		if (SimpleMisfire.FIRE_NOW == info.getSimpleMisfire())
+	private void setSimpleMisFireType(SimpleMisfire simple, SimpleScheduleBuilder simpleScheduleBuilder) {
+		switch (String.valueOf(simple)) {
+		case "FIRE_NOW":
 			simpleScheduleBuilder.withMisfireHandlingInstructionFireNow();
-		else if (SimpleMisfire.IGNORE_MISFIRES == info.getSimpleMisfire())
+			break;
+		case "IGNORE_MISFIRES":
 			simpleScheduleBuilder.withMisfireHandlingInstructionIgnoreMisfires();
-		else if (SimpleMisfire.NEXT_WITH_EXISTING_COUNT == info.getSimpleMisfire())
+			break;
+		case "NEXT_WITH_EXISTING_COUNT":
 			simpleScheduleBuilder.withMisfireHandlingInstructionNextWithExistingCount();
-		else if (SimpleMisfire.NOW_WITH_EXISTING_COUNT == info.getSimpleMisfire())
-			simpleScheduleBuilder.withMisfireHandlingInstructionNowWithExistingCount();
-		else if (SimpleMisfire.NEXT_WITH_REMAINING_COUNT == info.getSimpleMisfire())
+			break;
+		case "NEXT_WITH_REMAINING_COUNT":
 			simpleScheduleBuilder.withMisfireHandlingInstructionNextWithRemainingCount();
-		else if (SimpleMisfire.NOW_WITH_REMAINING_COUNT == info.getSimpleMisfire())
+
+			break;
+		case "NOW_WITH_EXISTING_COUNT":
+			simpleScheduleBuilder.withMisfireHandlingInstructionNextWithRemainingCount();
+			break;
+		case "NOW_WITH_REMAINING_COUNT":
 			simpleScheduleBuilder.withMisfireHandlingInstructionNowWithRemainingCount();
-		else
+			break;
+		default:
 			simpleScheduleBuilder.withMisfireHandlingInstructionFireNow();
+			break;
+		}
 
 	}
 
 	@Override
-	public boolean UnscheduleJob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException {
-		this.delete(quartzTaskInformation.getTaskId(), Scheduler.DEFAULT_GROUP);
+	public boolean UnscheduleJob(String jobId) throws CustomSchedulerServiceException {
+		try {
+			this.delete(jobId, this.scheduler.DEFAULT_GROUP);
+		} catch (SchedulerException e) {
+			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
+		}
 		return true;
+
 	}
 
-	private boolean delete(String jobId, String jobGroup) throws SchedulerException {
-		boolean flag = false;
+	private void delete(String jobId, String jobGroup) throws SchedulerException {
+		// boolean flag = false;
 		TriggerKey triggerKey = TriggerKey.triggerKey(jobId, jobGroup);
 		if (checkExists(triggerKey)) {
 			scheduler.pauseTrigger(triggerKey);
 			scheduler.unscheduleJob(triggerKey);
-			flag = true;
+			return;
 		}
-		return flag;
+		throw new CustomSchedulerServiceException("job not exisits");
 	}
 
 	private void resume(String jobId, String jobGroup) throws SchedulerException {
@@ -158,14 +185,22 @@ public class QuartzSchedulerServiceImpl implements QuartzSchedulerService {
 
 	@SuppressWarnings("static-access")
 	@Override
-	public boolean resumeJob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException {
-		this.resume(quartzTaskInformation.getTaskId(), this.scheduler.DEFAULT_GROUP);
+	public boolean resumeJob(String jobId) throws CustomSchedulerServiceException {
+		try {
+			this.resume(jobId, this.scheduler.DEFAULT_GROUP);
+		} catch (SchedulerException e) {
+			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
+		}
 		return true;
 	}
 
 	@SuppressWarnings("static-access")
-	public boolean pausejob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException {
-		this.pause(quartzTaskInformation.getTaskId(), this.scheduler.DEFAULT_GROUP);
+	public boolean pausejob(String jobId) throws CustomSchedulerServiceException {
+		try {
+			this.pause(jobId, this.scheduler.DEFAULT_GROUP);
+		} catch (SchedulerException e) {
+			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
+		}
 		return true;
 	}
 

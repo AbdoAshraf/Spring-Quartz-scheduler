@@ -6,9 +6,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.quartz.demo.dto.QuartzTaskEvent;
-import com.quartz.demo.dto.QuartzTaskInformation;
+import com.quartz.demo.dto.QuartzTaskConfigDTO;
+import com.quartz.demo.dto.QuartzTaskEventDTO;
+import com.quartz.demo.dto.QuartzTaskInformationDTO;
 import com.quartz.demo.exception.InfoServiceExcseption;
+import com.quartz.demo.io.entity.QuartzTaskConfigEntity;
 import com.quartz.demo.io.entity.QuartzTaskEventEntity;
 import com.quartz.demo.io.entity.QuartzTaskInformationEntity;
 import com.quartz.demo.io.repo.QuartzTaskInformationRepo;
@@ -28,40 +30,51 @@ public class QuartzInformationServiceImpl implements QuartzInformationService {
 	}
 
 	@Override
-	public QuartzTaskInformation insertNewJob(QuartzTaskInformation quartzTaskInformation) {
-		QuartzTaskInformationEntity entity = this.modelMapper.map(quartzTaskInformation,
+	public QuartzTaskInformationDTO insertNewJob(QuartzTaskInformationDTO quartzTaskInformationDTO) {
+		QuartzTaskInformationEntity entity = this.modelMapper.map(quartzTaskInformationDTO,
 				QuartzTaskInformationEntity.class);
 		entity.setTaskId(UUID.randomUUID().toString());
-		entity.setJobStatus(JobStatus.FROZEN);
-		// entity.getQartzTaskAnalytics().setFrozenTime(LocalDateTime.now());
+		entity.getQartzTaskAnalytics().setJobStatus(JobStatus.FROZEN);
 		entity = this.quartzTaskInformationRepo.save(entity);
-		return this.modelMapper.map(entity, QuartzTaskInformation.class);
+		return this.modelMapper.map(entity, QuartzTaskInformationDTO.class);
 	}
 
 	@Override
-	public QuartzTaskInformation getJobDetails(String id) {
-		return this.modelMapper.map(this.quartzTaskInformationRepo.findByTaskId(id)
-				.orElseThrow(() -> new InfoServiceExcseption("invalid task id")), QuartzTaskInformation.class);
+	public QuartzTaskInformationDTO getJobDetails(String id) {
+		return this.modelMapper.map(this.getJob(id), QuartzTaskInformationDTO.class);
 	}
 
 	private QuartzTaskInformationEntity getJob(String id) {
-		return this.quartzTaskInformationRepo.findByTaskId(id)
-				.orElseThrow(() -> new InfoServiceExcseption("invalid task id"));
+		QuartzTaskInformationEntity entity = this.quartzTaskInformationRepo.findByTaskId(id);
+		if (entity == null)
+			throw new InfoServiceExcseption("invalid task id");
+		return entity;
 	}
 
 	@Override
-	public void recordError(QuartzTaskEvent quartzTaskError, String taskId) {
+	public void recordEvent(QuartzTaskEventDTO quartzTaskError, String taskId) {
 		QuartzTaskInformationEntity entity = getJob(taskId);
 		if (quartzTaskError.getEventType() == EventType.Error) {
-			long count = entity.getFailCount() + 1;
-			entity.setFailCount(count);
+			long failCount = entity.getQartzTaskAnalytics().getFailCount() + 1;
+			entity.getQartzTaskAnalytics().setFailCount(failCount);
 		}
 		entity.getQuartzTaskEventsList().add(this.modelMapper.map(quartzTaskError, QuartzTaskEventEntity.class));
 		this.quartzTaskInformationRepo.save(entity);
 	}
 
 	@Override
-	public QuartzTaskInformation updateJob(QuartzTaskInformation quartzTaskInformation) {
-		return null;
+	public void updateJobStatus(String taskId, JobStatus jobStatus) {
+		if (jobStatus == null)
+			throw new InfoServiceExcseption("invalid jobStatus");
+		QuartzTaskInformationEntity entity = getJob(taskId);
+		entity.getQartzTaskAnalytics().setJobStatus(jobStatus);
+		this.quartzTaskInformationRepo.save(entity);
+	}
+
+	@Override
+	public void updateJobConfig(String taskId, QuartzTaskConfigDTO quartzTaskConfigDTO) {
+		QuartzTaskInformationEntity entity = getJob(taskId);
+		entity.setQuartzTaskConfig(this.modelMapper.map(quartzTaskConfigDTO, QuartzTaskConfigEntity.class));
+		this.quartzTaskInformationRepo.save(entity);
 	}
 }

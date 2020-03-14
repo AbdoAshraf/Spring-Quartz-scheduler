@@ -22,9 +22,9 @@ import lombok.Setter;
 @NoArgsConstructor
 
 public class QuartzTaskEventEntity {
-
 	@Id
 	@Column(nullable = false)
+
 	private String errorId;
 
 	private EventType eventType;

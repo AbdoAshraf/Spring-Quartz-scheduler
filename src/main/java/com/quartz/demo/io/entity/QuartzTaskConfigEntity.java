@@ -41,6 +41,7 @@ public class QuartzTaskConfigEntity {
 
 	private int triggerPriority;
 
+	private int repeatCount;
 	private SimpleMisfire simpleMisfire;
 
 	private CronMisfire cronMisfire;

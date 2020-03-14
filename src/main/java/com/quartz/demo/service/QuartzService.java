@@ -1,25 +1,24 @@
 package com.quartz.demo.service;
 
-import com.quartz.demo.dto.QuartzTaskEvent;
-import com.quartz.demo.dto.QuartzTaskInformation;
+import com.quartz.demo.dto.QuartzTaskConfigDTO;
+import com.quartz.demo.dto.QuartzTaskEventDTO;
+import com.quartz.demo.dto.QuartzTaskInformationDTO;
 import com.quartz.demo.exception.CustomSchedulerServiceException;
 
 public interface QuartzService {
-	
-	QuartzTaskInformation insertNewJob(QuartzTaskInformation quartzTaskInformation);
 
-	QuartzTaskInformation updateJob(QuartzTaskInformation quartzTaskInformation);
+	QuartzTaskInformationDTO insertNewJob(QuartzTaskInformationDTO quartzTaskInformationDTO);
 
-	QuartzTaskInformation getJobDetails(String id);
-	
+	QuartzTaskInformationDTO getJobDetails(String id);
+
 	boolean freezJob(String jobId) throws CustomSchedulerServiceException;
-	
-	boolean ScheduleJob(String jobId)throws CustomSchedulerServiceException;
-	
-	boolean ResumeJob(String jobId)throws CustomSchedulerServiceException;
 
-	void recordError(QuartzTaskEvent quartzTaskError, String id);
+	boolean ScheduleJob(String jobId) throws CustomSchedulerServiceException;
 
-	
+	boolean ResumeJob(String jobId) throws CustomSchedulerServiceException;
+
+	void recordError(QuartzTaskEventDTO quartzTaskError, String id);
+
+	void updateJobConfig(String taskId, QuartzTaskConfigDTO quartzTaskConfigDTO);
 
 }

@@ -1,10 +1,11 @@
 package com.quartz.demo.io.entity;
 
-import java.time.LocalDateTime;
-
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
+import com.quartz.demo.util.enums.JobStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,8 +23,10 @@ public class QartzTaskAnalyticsEntity {
 	@GeneratedValue
 	private long id;
 
-	private LocalDateTime frozenTime;
+	@Column(nullable = false)
+	private JobStatus jobStatus;
 
-	private LocalDateTime unfrozenTime;
+	@Column(nullable = false)
+	private long failCount;
 
 }
