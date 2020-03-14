@@ -1,27 +1,25 @@
-package com.quartz.demo.dto;
+package com.quartz.demo.controller.payload;
+
+import javax.validation.constraints.NotNull;
 
 import com.quartz.demo.util.enums.CronMisfire;
 import com.quartz.demo.util.enums.SendType;
 import com.quartz.demo.util.enums.SimpleMisfire;
 import com.quartz.demo.util.enums.TriggerType;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class QuartzTaskConfig {
-
+	@NotNull
 	private SendType sendType;
-
+	@NotNull
 	private String url;
-
+	@NotNull
 	private String cornExp;
 
 	private String executeParamter;

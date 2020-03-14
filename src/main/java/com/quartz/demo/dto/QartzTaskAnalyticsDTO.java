@@ -1,7 +1,5 @@
 package com.quartz.demo.dto;
 
-import java.time.LocalDateTime;
-
 import com.quartz.demo.util.enums.JobStatus;
 
 import lombok.AllArgsConstructor;
@@ -15,17 +13,17 @@ import lombok.Setter;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class QartzTaskAnalytics {
+public class QartzTaskAnalyticsDTO {
 
-	private LocalDateTime frozenTime;
-
-	private LocalDateTime unfrozenTime;
-
-	private LocalDateTime lastmodifyTime;
-
-	private long sucssesCount;
+////	private LocalDateTime frozenTime;
+////
+////	private LocalDateTime unfrozenTime;
+////
+////	private LocalDateTime lastmodifyTime;
+//
+//	private long sucssesCount;
 
 	private JobStatus jobStatus;
-	private long failCount;
+	private long failCount = 0;
 
 }

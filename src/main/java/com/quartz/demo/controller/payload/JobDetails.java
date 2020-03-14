@@ -1,4 +1,4 @@
-package com.quartz.demo.api.payload;
+package com.quartz.demo.controller.payload;
 
 import javax.validation.constraints.NotNull;
 

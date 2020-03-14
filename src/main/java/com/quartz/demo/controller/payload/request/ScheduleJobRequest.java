@@ -1,6 +1,6 @@
-package com.quartz.demo.api.payload.request;
+package com.quartz.demo.controller.payload.request;
 
-import com.quartz.demo.api.payload.JobDetails;
+import com.quartz.demo.controller.payload.JobDetails;
 
 import lombok.Getter;
 import lombok.Setter;

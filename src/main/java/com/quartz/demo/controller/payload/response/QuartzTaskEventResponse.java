@@ -1,22 +1,15 @@
-package com.quartz.demo.dto;
+package com.quartz.demo.controller.payload.response;
 
 import java.time.LocalDateTime;
 
 import com.quartz.demo.util.enums.EventType;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class QuartzTaskEvent {
-
+public class QuartzTaskEventResponse {
 	private String errorId;
 
 	private EventType eventType;

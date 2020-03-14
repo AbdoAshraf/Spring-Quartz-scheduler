@@ -3,7 +3,6 @@ package com.quartz.demo.dto;
 import java.util.List;
 
 import com.quartz.demo.util.enums.CronMisfire;
-import com.quartz.demo.util.enums.JobStatus;
 import com.quartz.demo.util.enums.SendType;
 import com.quartz.demo.util.enums.SimpleMisfire;
 import com.quartz.demo.util.enums.TriggerType;
@@ -15,21 +14,20 @@ import lombok.Setter;
 @Getter
 @Setter
 @Data
-public class QuartzTaskInformation {
+public class QuartzTaskInformationDTO {
 	private String taskId;
 
 	private String taskName;
 
-	List<QuartzTaskEvent> quartzTaskEventsList;
+	List<QuartzTaskEventDTO> quartzTaskEventsList;
 
-	QuartzTaskConfig quartzTaskConfig;
+	QuartzTaskConfigDTO quartzTaskConfig;
 
-	private JobStatus jobStatus;
+	QartzTaskAnalyticsDTO qartzTaskAnalytics;
 
-	private long failCount;
-
-	public QuartzTaskInformation() {
-		quartzTaskConfig = new QuartzTaskConfig();
+	public QuartzTaskInformationDTO() {
+		quartzTaskConfig = new QuartzTaskConfigDTO();
+		qartzTaskAnalytics = new QartzTaskAnalyticsDTO();
 	}
 
 	public SendType getSendType() {
@@ -65,7 +63,7 @@ public class QuartzTaskInformation {
 	}
 
 	public int getRepeatCount() {
-		return this.getRepeatCount();
+		return this.quartzTaskConfig.getRepeatCount();
 	}
 
 	public SimpleMisfire getSimpleMisfire() {
