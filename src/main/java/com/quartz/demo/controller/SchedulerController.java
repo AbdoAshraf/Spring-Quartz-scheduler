@@ -1,4 +1,4 @@
-package com.quartz.demo.api;
+package com.quartz.demo.controller;
 
 import static org.springframework.http.ResponseEntity.created;
 
@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.quartz.demo.api.payload.request.ScheduleJobRequest;
-import com.quartz.demo.api.payload.response.JobDetailsResponse;
-import com.quartz.demo.api.payload.response.ScheduleJobResponse;
-import com.quartz.demo.dto.QuartzTaskInformation;
+import com.quartz.demo.controller.payload.QuartzTaskConfig;
+import com.quartz.demo.controller.payload.request.ScheduleJobRequest;
+import com.quartz.demo.controller.payload.response.JobDetailsResponse;
+import com.quartz.demo.controller.payload.response.ScheduleJobResponse;
+import com.quartz.demo.dto.QuartzTaskConfigDTO;
+import com.quartz.demo.dto.QuartzTaskInformationDTO;
 import com.quartz.demo.service.QuartzService;
 
 @RestController
@@ -37,11 +39,11 @@ public class SchedulerController {
 	@PostMapping("/add-job")
 	public ResponseEntity addJob(@RequestBody @Valid ScheduleJobRequest scheduleJobRequest,
 			HttpServletRequest request) {
-		QuartzTaskInformation quartzTaskInformation = this.quartzService
-				.insertNewJob(this.modelMapper.map(scheduleJobRequest, QuartzTaskInformation.class));
+		QuartzTaskInformationDTO quartzTaskInformationDTO = this.quartzService
+				.insertNewJob(this.modelMapper.map(scheduleJobRequest, QuartzTaskInformationDTO.class));
 
 		return created(ServletUriComponentsBuilder.fromContextPath(request).path("/get-job/{id}")
-				.buildAndExpand(quartzTaskInformation.getTaskId()).toUri()).build();
+				.buildAndExpand(quartzTaskInformationDTO.getTaskId()).toUri()).build();
 
 	}
 
@@ -69,6 +71,13 @@ public class SchedulerController {
 		this.quartzService.ResumeJob(jobId);
 		return new ResponseEntity<>(new ScheduleJobResponse(jobId, "job resumed sucessfully"), HttpStatus.OK);
 
+	}
+
+	@PutMapping("update-job/{jobId}")
+	public ResponseEntity<ScheduleJobResponse> updateJob(@PathVariable String jobId,
+			@RequestBody @Valid QuartzTaskConfig quartzTaskConfig) {
+		this.quartzService.updateJobConfig(jobId, this.modelMapper.map(quartzTaskConfig, QuartzTaskConfigDTO.class));
+		return new ResponseEntity<>(new ScheduleJobResponse(jobId, "job updated sucessfully"), HttpStatus.OK);
 	}
 
 }

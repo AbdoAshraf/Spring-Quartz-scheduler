@@ -1,15 +1,14 @@
 package com.quartz.demo.service.scheduler;
 
-import org.quartz.SchedulerException;
-
-import com.quartz.demo.dto.QuartzTaskInformation;
+import com.quartz.demo.dto.QuartzTaskInformationDTO;
+import com.quartz.demo.exception.CustomSchedulerServiceException;
 
 public interface QuartzSchedulerService {
-	public boolean scheduleJob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException ;
+	public boolean scheduleJob(QuartzTaskInformationDTO quartzTaskInformationDTO) throws CustomSchedulerServiceException;
 
-	boolean UnscheduleJob(QuartzTaskInformation quartzTaskInformation)throws SchedulerException;
+	boolean UnscheduleJob(String jobId) throws CustomSchedulerServiceException;
 
-	boolean pausejob(QuartzTaskInformation quartzTaskInformation) throws SchedulerException;
+	boolean pausejob(String jobId) throws CustomSchedulerServiceException;
 
-	boolean resumeJob(QuartzTaskInformation quartzTaskInformation)throws SchedulerException;
+	boolean resumeJob(String jobId) throws CustomSchedulerServiceException;
 }

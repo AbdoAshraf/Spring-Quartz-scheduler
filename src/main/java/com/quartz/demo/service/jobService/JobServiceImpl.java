@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.quartz.demo.dto.QuartzTaskEvent;
+import com.quartz.demo.dto.QuartzTaskEventDTO;
 import com.quartz.demo.service.info.QuartzInformationService;
 import com.quartz.demo.service.messaging.GreetingsService;
 import com.quartz.demo.stream.Greetings;
@@ -27,6 +27,9 @@ public class JobServiceImpl implements JobService {
 	@Autowired
 	private QuartzInformationService quartzInformationService;
 
+	@Autowired
+	private RestTemplate restTemplate;
+
 	@Override
 	public void call(JobDataMap jobDataMap) {
 		String sendType = jobDataMap.getString("sendType");
@@ -41,16 +44,22 @@ public class JobServiceImpl implements JobService {
 	}
 
 	private void callUrl(JobDataMap jobDataMap) {
+		String eventId = UUID.randomUUID().toString();
 		try {
-			RestTemplate restTemplate = new RestTemplate();
+			// RestTemplate restTemplate = new RestTemplate();
 			ResponseEntity<String> response = restTemplate.getForEntity(jobDataMap.getString("url"), String.class);
 			log.info("id={},taskName={},sendtype={}url", jobDataMap.getString("id"), jobDataMap.getString("name"),
 					jobDataMap.getString("url"));
 			if (response.getStatusCode() != HttpStatus.OK) {
 				log.error("id={},taskName={},message={}", jobDataMap.getString("id"), jobDataMap.getString("name"),
 						response);
+				recordEvent(jobDataMap.getString("id"), eventId, EventType.Error, response.toString());
 			}
+			recordEvent(jobDataMap.getString("id"), eventId, EventType.Success, "http called successfully");
 		} catch (Exception ex) {
+			log.error("id={},taskName={},message={}", jobDataMap.getString("id"), jobDataMap.getString("name"),
+					ex.getMessage());
+			recordEvent(jobDataMap.getString("id"), eventId, EventType.Error, ex.getMessage());
 
 		}
 
@@ -78,8 +87,8 @@ public class JobServiceImpl implements JobService {
 	}
 
 	private void recordEvent(String jobId, String eventId, EventType eventType, String message) {
-		QuartzTaskEvent quartzTaskEvent = new QuartzTaskEvent(eventId, eventType, LocalDateTime.now(), message);
-		quartzInformationService.recordError(quartzTaskEvent, jobId);
+		QuartzTaskEventDTO quartzTaskEventDTO = new QuartzTaskEventDTO(eventId, eventType, LocalDateTime.now(), message);
+		quartzInformationService.recordEvent(quartzTaskEventDTO, jobId);
 	}
 
 }

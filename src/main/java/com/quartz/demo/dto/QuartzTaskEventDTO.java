@@ -1,10 +1,6 @@
-package com.quartz.demo.io.entity;
+package com.quartz.demo.dto;
 
 import java.time.LocalDateTime;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
 import com.quartz.demo.util.enums.EventType;
 
@@ -17,13 +13,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Data
-@Entity
-@AllArgsConstructor
 @NoArgsConstructor
-
-public class QuartzTaskEventEntity {
-	@Id
-	@Column(nullable = false)
+@AllArgsConstructor
+public class QuartzTaskEventDTO {
 
 	private String errorId;
 

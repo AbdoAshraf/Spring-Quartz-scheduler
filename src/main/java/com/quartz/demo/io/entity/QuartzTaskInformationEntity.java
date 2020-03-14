@@ -12,8 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import com.quartz.demo.util.enums.JobStatus;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,10 +32,6 @@ public class QuartzTaskInformationEntity {
 	private String taskName;
 
 	@Column(nullable = false)
-	private JobStatus jobStatus;
-
-	@Column(nullable = false)
-	long failCount;
 	@JoinColumn
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	List<QuartzTaskEventEntity> quartzTaskEventsList;
@@ -45,5 +39,9 @@ public class QuartzTaskInformationEntity {
 	@JoinColumn
 	@OneToOne(cascade = CascadeType.ALL)
 	QuartzTaskConfigEntity quartzTaskConfig;
+
+	@JoinColumn
+	@OneToOne(cascade = CascadeType.ALL)
+	QartzTaskAnalyticsEntity QartzTaskAnalytics;
 
 }

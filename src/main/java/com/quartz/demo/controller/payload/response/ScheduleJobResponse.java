@@ -1,4 +1,4 @@
-package com.quartz.demo.api.payload.response;
+package com.quartz.demo.controller.payload.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,16 +1,20 @@
 package com.quartz.demo.service.info;
 
-import com.quartz.demo.dto.QuartzTaskEvent;
-import com.quartz.demo.dto.QuartzTaskInformation;
+import com.quartz.demo.dto.QuartzTaskConfigDTO;
+import com.quartz.demo.dto.QuartzTaskEventDTO;
+import com.quartz.demo.dto.QuartzTaskInformationDTO;
+import com.quartz.demo.util.enums.JobStatus;
 
 public interface QuartzInformationService {
 
-	QuartzTaskInformation insertNewJob(QuartzTaskInformation quartzTaskInformation);
+	QuartzTaskInformationDTO insertNewJob(QuartzTaskInformationDTO quartzTaskInformationDTO);
 
-	QuartzTaskInformation updateJob(QuartzTaskInformation quartzTaskInformation);
+	QuartzTaskInformationDTO getJobDetails(String id);
 
-	QuartzTaskInformation getJobDetails(String id);
+	void recordEvent(QuartzTaskEventDTO quartzTaskError, String id);
 
-	void recordError(QuartzTaskEvent quartzTaskError, String id);
+	void updateJobStatus(String taskId, JobStatus jobStatus);
+
+	void updateJobConfig(String taskId, QuartzTaskConfigDTO quartzTaskConfigDTO);
 
 }

@@ -1,15 +1,16 @@
 package com.quartz.demo.service;
 
-import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.quartz.demo.dto.QuartzTaskEvent;
-import com.quartz.demo.dto.QuartzTaskInformation;
+import com.quartz.demo.dto.QuartzTaskConfigDTO;
+import com.quartz.demo.dto.QuartzTaskEventDTO;
+import com.quartz.demo.dto.QuartzTaskInformationDTO;
 import com.quartz.demo.exception.CustomSchedulerServiceException;
 import com.quartz.demo.exception.ValidationException;
 import com.quartz.demo.service.info.QuartzInformationService;
 import com.quartz.demo.service.scheduler.QuartzSchedulerService;
+import com.quartz.demo.util.enums.JobStatus;
 import com.quartz.demo.util.enums.SendType;
 import com.quartz.demo.util.enums.TriggerType;
 
@@ -29,12 +30,20 @@ public class QuartzServiceImpl implements QuartzService {
 	}
 
 	@Override
-	public QuartzTaskInformation insertNewJob(QuartzTaskInformation quartzTaskInformation) {
-		this.validate(quartzTaskInformation);
-		return this.quartzInformationService.insertNewJob(quartzTaskInformation);
+	public QuartzTaskInformationDTO insertNewJob(QuartzTaskInformationDTO quartzTaskInformationDTO) {
+		this.validate(quartzTaskInformationDTO.getQuartzTaskConfig());
+		return this.quartzInformationService.insertNewJob(quartzTaskInformationDTO);
 	}
 
-	private void validate(QuartzTaskInformation quartzTaskInformation) throws ValidationException {
+	@Override
+	public void updateJobConfig(String taskId, QuartzTaskConfigDTO quartzTaskConfigDTO) {
+		this.validate(quartzTaskConfigDTO);
+		this.quartzInformationService.updateJobConfig(taskId, quartzTaskConfigDTO);
+		this.quartzSchedulerService.UnscheduleJob(taskId);
+		this.quartzSchedulerService.scheduleJob(this.getJobDetails(taskId));
+	}
+
+	private void validate(QuartzTaskConfigDTO quartzTaskInformation) throws ValidationException {
 		if (quartzTaskInformation.getSendType() == SendType.URL && quartzTaskInformation.getUrl() == null) {
 			throw new ValidationException("messing url");
 		}
@@ -48,55 +57,51 @@ public class QuartzServiceImpl implements QuartzService {
 	}
 
 	@Override
-	public QuartzTaskInformation updateJob(QuartzTaskInformation quartzTaskInformation) {
-		return this.quartzInformationService.updateJob(quartzTaskInformation);
-	}
-
-	@Override
-	public QuartzTaskInformation getJobDetails(String id) {
+	public QuartzTaskInformationDTO getJobDetails(String id) {
 		return this.quartzInformationService.getJobDetails(id);
 	}
 
 	@Override
 	public boolean freezJob(String jobId) throws CustomSchedulerServiceException {
-		QuartzTaskInformation quartzTaskInformation = this.quartzInformationService.getJobDetails(jobId);
+		QuartzTaskInformationDTO quartzTaskInformationDTO = this.quartzInformationService.getJobDetails(jobId);
 		try {
-			this.quartzSchedulerService.pausejob(quartzTaskInformation);
-		} catch (SchedulerException e) {
-			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
+			this.quartzSchedulerService.pausejob(quartzTaskInformationDTO.getTaskId());
+		} catch (CustomSchedulerServiceException e) {
+			throw e;
 		}
-		// this.quartzInformationService.updateJobStatus(jobId, JobStatus.FROZEN);
+		this.quartzInformationService.updateJobStatus(jobId, JobStatus.FROZEN);
 		return true;
 	}
 
 	@Override
 	public boolean ScheduleJob(String jobId) throws CustomSchedulerServiceException {
-		QuartzTaskInformation quartzTaskInformation = this.quartzInformationService.getJobDetails(jobId);
+		QuartzTaskInformationDTO quartzTaskInformationDTO = this.quartzInformationService.getJobDetails(jobId);
 		try {
-			this.quartzSchedulerService.scheduleJob(quartzTaskInformation);
-		} catch (SchedulerException e) {
-			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
+			this.quartzSchedulerService.scheduleJob(quartzTaskInformationDTO);
+		} catch (CustomSchedulerServiceException e) {
+			throw e;
 		}
-		// this.quartzInformationService.updateJobStatus(jobId, JobStatus.UNFROZEN);
+		this.quartzInformationService.updateJobStatus(jobId, JobStatus.UNFROZEN);
 		return true;
 
 	}
 
 	@Override
 	public boolean ResumeJob(String jobId) throws CustomSchedulerServiceException {
-		QuartzTaskInformation quartzTaskInformation = this.quartzInformationService.getJobDetails(jobId);
+		QuartzTaskInformationDTO quartzTaskInformationDTO = this.quartzInformationService.getJobDetails(jobId);
 		try {
-			this.quartzSchedulerService.resumeJob(quartzTaskInformation);
-		} catch (SchedulerException e) {
-			throw new CustomSchedulerServiceException(e.getMessage(), e, true, true);
+			this.quartzSchedulerService.resumeJob(quartzTaskInformationDTO.getTaskId());
+		} catch (CustomSchedulerServiceException e) {
+			throw e;
 
 		}
+		this.quartzInformationService.updateJobStatus(jobId, JobStatus.UNFROZEN);
 		return true;
 	}
 
 	@Override
-	public void recordError(QuartzTaskEvent quartzTaskError, String id) {
-		this.quartzInformationService.recordError(quartzTaskError, id);
+	public void recordError(QuartzTaskEventDTO quartzTaskError, String id) {
+		this.quartzInformationService.recordEvent(quartzTaskError, id);
 	}
 
 }
